@@ -1,0 +1,37 @@
+.controls-container {
+    z-index: 1000;
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+#controls {
+    width: 50%;
+    height: 4rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    place-items: center;
+    place-content: center;
+    border: 1px solid pink;
+    background-color: #111727;
+    border-radius: 9999px;
+}
+
+.hand {
+    height: 20px;
+    pointer-events: none;        /* Prevent blocking clicks */
+}
+
+/* Individual card wrapper */
+.cardWrapper {
+    position: absolute;
+    bottom: 10px;
+    transition: transform 0.2s ease;
+}
+
+/* Optional hover effect */
+.cardWrapper:hover {
+    transform: translateY(12px);
+    z-index: 10;
+}

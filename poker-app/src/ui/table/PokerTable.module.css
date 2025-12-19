@@ -1,0 +1,33 @@
+#table {
+  width: 100%;
+  height: fit-content;
+  border: 1px solid blue;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: 1fr 3fr 1fr;
+  padding: 2rem;
+  
+}
+
+@media (min-width: 768px) {
+  #table {
+    background-image: url("/table.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+}
+
+
+#community {
+  grid-column: 2 / span 3;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: center;
+  align-items: start;
+  border: 1px solid blue;
+}

@@ -1,0 +1,57 @@
+
+.top1 { grid-column: 2; grid-row: 1; border-bottom: none; }
+.top2 { grid-column: 3; grid-row: 1; border-bottom: none; }
+.top3 { grid-column: 4; grid-row: 1; border-bottom: none; }
+
+
+.user {
+  grid-column: 3;
+  grid-row: 3;
+  border-top: none;
+}
+
+.player {
+    position: relative;          /* Anchor for absolute children */
+    width: 220px;
+    padding: 12px;
+    background: #1e1e1e;
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+
+    /* IMPORTANT */
+    overflow: visible;           /* Allow cards to escape */
+}
+
+.name {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.bet,
+.chips {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+/* Hand container escapes the card */
+.hand {
+    position: absolute;
+    bottom: -40px;               /* Push hand outside player box */
+    left: 50%;
+    transform: translateX(-50%);
+    height: 120px;
+    pointer-events: none;        /* Prevent blocking clicks */
+}
+
+/* Individual card wrapper */
+.cardWrapper {
+    position: absolute;
+    transition: transform 0.2s ease;
+}
+
+/* Optional hover effect */
+.cardWrapper:hover {
+    transform: translateY(-12px);
+    z-index: 10;
+}
