@@ -11,12 +11,6 @@ export default function Player({
 }) {
     return (
         <div className={`${styles.player} ${styles[position]}`}>
-            <h2 className={styles.name}>{player.name}</h2>
-
-            <p className={styles.bet}>
-                Current Bet: {player.currentBet}
-            </p>
-
             <div className={styles.hand}>
                 {player.hand.map((card: CardType, index: number) => (
                     <div
@@ -24,14 +18,19 @@ export default function Player({
                         className={styles.cardWrapper}
                         style={{ transform: `translateX(${index * 30}px)` }}
                     >
-                        <Card card={card} />
+                        <Card card={card} back={player.kind === 'bot'} />
                     </div>
                 ))}
             </div>
-
-            <p className={styles.chips}>
-                Chips: {player.chips}
-            </p>
+            <div className={styles.playerInfo}>
+                <h2 className={styles.name}>{player.name}</h2>
+                <p className={styles.bet}>
+                    Current Bet: {player.currentBet}
+                </p>
+                <p className={styles.chips}>
+                    Chips: {player.chips}
+                </p>
+            </div>
         </div>
     );
 }

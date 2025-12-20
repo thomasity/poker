@@ -1,13 +1,11 @@
 .controls-container {
     z-index: 1000;
-    position: absolute;
-    bottom: 10px;
+    height: 100%;
     width: 100%;
 }
 
 #controls {
     width: 50%;
-    height: 4rem;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;

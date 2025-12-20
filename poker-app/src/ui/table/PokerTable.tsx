@@ -17,10 +17,10 @@ export default function PokerTable({ state } : { state: GameState }) {
                     <Player position={position} player={p} />
                 )
             })}
-            <div id={styles.community}>
-                <h2>Pot: {state.pot}</h2>
-                <p>Bet to match: {state.currentBet}</p>
-                <div id={styles.community}>
+            <div className={styles['table-content']}>
+                <h2>Pot: ${state.pot}</h2>
+                {state.currentBet > 0 && <p>Amount to call: {state.currentBet}</p>}
+                <div className={styles.community}>
                     {state.community.map((c, i) => {
                         return(
                             <Card key={`card ${i}`} card={c} />
