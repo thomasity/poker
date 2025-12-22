@@ -14,7 +14,7 @@ export interface PlayerBase {
     folded: boolean;
     currentBet: number;
     totalBet: number;
-    madeAction: boolean;
+    action?: PlayerAction;
 }
 
 export interface HumanPlayer extends PlayerBase {
@@ -29,7 +29,29 @@ export interface BotPlayer extends PlayerBase {
 export type Player = HumanPlayer | BotPlayer;
 
 export type Street = 'preflop' | 'flop' | 'turn' | 'river';
-export type Phase = 'inHand' | 'handOver';
+
+export type Phase = 'inHand' | 'handOver' | 'showdown' | 'dealing' ;
+
+export type PregameConfig = {
+    players: Player[],
+    buyIn: number,
+    bigBlind: number,
+    smallBlind: number
+}
+
+export type GameEvent = 
+    | { type: "PLAYER_ACTION"; action: PlayerAction }
+    | { type: "BOT_ACTION"; action: PlayerAction }
+    | { type: "ADVANCE_STREET" }
+    | { type: "START_SHOWDOWN" }
+    | { type: "END_HAND" }
+    | { type: "START_NEXT_HAND" }
+    | { type: "INITIATE_GAME"; config: PregameConfig }
+
+export type GameEffect =
+    | { type: "NONE" }
+    | { type: "AFTER"; ms: number; event: GameEvent; key: "street" | "hand" | "bot" }
+    | { type: "BOT_TURN_AFTER"; ms: number, key: "bot" };
 
 export interface GameState {
     playing: boolean;

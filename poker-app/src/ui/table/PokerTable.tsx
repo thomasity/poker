@@ -4,7 +4,7 @@ import Player from '../player/Player';
 import styles from './PokerTable.module.css';
 
 
-export default function PokerTable({ state } : { state: GameState }) {
+export default function PokerTable({ state } : { state: GameState; }) {
     const opponents = state.players.filter(p => p.kind === 'bot')
     if (!state) {
         return <div id={styles.table}></div>;
@@ -12,9 +12,9 @@ export default function PokerTable({ state } : { state: GameState }) {
     return (
         <div id={styles.table}>
             {opponents.map((p, i) => {
-                const position = `top${i + 1}`
+                const position = `bot${i+1}`
                 return(
-                    <Player position={position} player={p} />
+                    <Player position={position} player={p} show={state.phase === 'showdown'}/>
                 )
             })}
             <div className={styles['table-content']}>

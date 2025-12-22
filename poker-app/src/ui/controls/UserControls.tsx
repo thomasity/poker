@@ -66,7 +66,7 @@ function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProp
         disabled={!canSubmit}
         onClick={() => {
           dispatch({ type: "bet", amount });
-          setIsBetting(false); // optional: close after submit
+          setIsBetting(false);
         }}
       >
         Submit
@@ -76,7 +76,7 @@ function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProp
 }
 
 function ActionControls({ state, dispatch, setIsBetting } : { state: GameState, dispatch: (action: PlayerAction) => void, setIsBetting: (betting: boolean) => void }) {
-    if (state.players.every(player => !player.madeAction)) {
+    if (state.players.every(player => player.action === undefined)) {
         return (
             <div>
                 <button onClick={() => dispatch({ type: "call" })}>Check</button>
@@ -98,7 +98,6 @@ export default function UserControls({ state, dispatch } : { state: GameState, d
     const [isBetting, setIsBetting] = useState<boolean>(false);
     const player = state.players[0];
 
-    if (state.playing) {
         return (
             <div className={styles['controls-container']}>
                 <div id={styles.controls}>
@@ -126,6 +125,4 @@ export default function UserControls({ state, dispatch } : { state: GameState, d
                 </div>
             </div>
         );
-    }
-    else return null;
 }

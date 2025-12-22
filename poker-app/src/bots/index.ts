@@ -1,11 +1,11 @@
 import type { GameState, PlayerAction } from "../types";
 import { chooseBasicAction } from "./strategies/basic";
 
-export function chooseAction(state: GameState) : PlayerAction {
+export function chooseAction(state: GameState) : PlayerAction | null {
     const player = state.players[state.currentPlayer];
 
     if (player.kind !== "bot") {
-        throw new Error("chooseAction called for non-bot player");
+        return null;
     }
 
     switch (player.botProfile) {
