@@ -1,4 +1,4 @@
-import type { GameState, PlayerAction } from "../types";
+import type { GameState, PlayerAction } from "../../types";
 import { chooseBasicAction } from "./strategies/basic";
 
 export function chooseAction(state: GameState) : PlayerAction | null {

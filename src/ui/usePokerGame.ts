@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import type { GameState, PlayerAction, BotPlayer, GameEffect, GameEvent, PregameConfig } from '../types';
-import * as engine from '../engine/pokerEngine';
-import * as bots from '../bots';
+import type { GameState, PlayerAction, GameEffect, GameEvent, PregameConfig } from '../types';
+import * as engine from '../poker';
+import * as bots from '../poker/bots';
 
 export function usePokerGame() {
-    const [state, setState] = useState<GameState>(() => engine.initGame());
+    const [state, setState] = useState<GameState>(() => {
+        // const saved = loadChips();
+        // return saved ? engine.resumeGame(saved) : engine.initGame();
+        return engine.initGame();
+    });
     
     const timersRef = useRef<Map<"bot" | "hand" | "street", number>>(new Map());
 
@@ -69,10 +73,28 @@ export function usePokerGame() {
         dispatchEvent({ type: "INITIATE_GAME", config });
     }, [clearAllTimers, dispatchEvent]);
 
+    const endGame = useCallback(() => {
+        console.log("Ending game...");
+        clearAllTimers();
+        dispatchEvent({ type: "END_GAME" });
+    }, [clearAllTimers, dispatchEvent])
+
+    const startHand = useCallback(() => {
+        console.log("Starting new hand...");
+        clearAllTimers();
+        dispatchEvent({ type: "START_NEXT_HAND" });
+    }, [clearAllTimers, dispatchEvent]);
+
+    useEffect(() => {
+        if (state.phase === "handOver") {
+            engine.persistChips(state);
+        }
+    }, [state.phase] );
+
     useEffect(() => clearAllTimers, [clearAllTimers]);
 
     const canAct = useMemo(() => state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "human", [state]);
     const isBotTurn = useMemo(() => state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "bot", [state]);
     
-    return { state, dispatch, dispatchEvent, startGame, canAct, isBotTurn }
+    return { state, dispatch, dispatchEvent, startGame, endGame, startHand, canAct, isBotTurn }
 }

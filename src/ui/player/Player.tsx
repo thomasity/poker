@@ -20,7 +20,7 @@ export default function Player({
     return (
         <div className={`${styles.player} ${styles[position]}`}>
             <div className={styles.hand}>
-                {player.hand.map((card: CardType, index: number) => {
+                {!player.folded && player.hand.map((card: CardType, index: number) => {
                     const translation = index === 0 ? -15 : 15;
                     const rotation = index === 0 ? -8 : 8;
                     return (

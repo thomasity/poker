@@ -86,17 +86,19 @@ function ActionControls({ state, dispatch, setIsBetting } : { state: GameState, 
         )
     }
     else {
-        <div>
-            <button onClick={() => dispatch({ type: "fold" })}>Fold</button>
-            <button onClick={() => dispatch({ type: "call" })}>Call</button>
-            <button onClick={() => setIsBetting(true)}>Raise</button>
-        </div>
+        return (
+          <div>
+              <button onClick={() => dispatch({ type: "fold" })}>Fold</button>
+              <button onClick={() => dispatch({ type: "call" })}>Call</button>
+              <button onClick={() => setIsBetting(true)}>Raise</button>
+          </div>
+        )
     }
 }
 
-export default function UserControls({ state, dispatch } : { state: GameState, dispatch: (action: PlayerAction) => void }) {
+export default function UserControls({ state, canAct, dispatch } : { state: GameState, canAct: boolean, dispatch: (action: PlayerAction) => void }) {
     const [isBetting, setIsBetting] = useState<boolean>(false);
-    const player = state.players[0];
+    const player = state.players.filter(p=> p.kind === 'human')[0];
 
         return (
             <div className={styles['controls-container']}>
@@ -106,7 +108,7 @@ export default function UserControls({ state, dispatch } : { state: GameState, d
                         <p>Chips: {player.chips}</p>
                         <p>Current Bet: {state.currentBet}</p>
                     </div>
-                    {state.currentPlayer === 0 && state.phase === 'inHand' ? isBetting ? (
+                    {canAct && state.phase === 'inHand' ? isBetting ? (
                         <BettingControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
                     ) : (
                         <ActionControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
