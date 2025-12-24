@@ -146,8 +146,6 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
     }
 }
 
-
-
 /** 
  * Applies a single player action (fold/call/bet) to the current hand and advances turn order.
  *

@@ -29,6 +29,8 @@ export function usePokerGame() {
         for (const effect of effects) {
             if (effect.type === "NONE") continue;
 
+            clearTimer(effect.key);
+
             if (effect.type === "AFTER") {
                 const id = setTimeout(() => {
                     dispatchEvent(effect.event);

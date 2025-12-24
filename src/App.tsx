@@ -13,7 +13,7 @@ export default function App() {
         <header>
             <div/>
             <h1 id="title">Poker Game</h1>
-            {state.playing && state.handWinner !== undefined && <button onClick={endGame}>New Game</button>}
+            {state.playing && <button onClick={endGame}>New Game</button>}
         </header>
         <main>
             {state.playing ? <PokerTable state={state} /> : <ConfigTable state={state} startGame={startGame} />}

@@ -96,35 +96,49 @@ function ActionControls({ state, dispatch, setIsBetting } : { state: GameState, 
     }
 }
 
-export default function UserControls({ state, canAct, dispatch } : { state: GameState, canAct: boolean, dispatch: (action: PlayerAction) => void }) {
-    const [isBetting, setIsBetting] = useState<boolean>(false);
-    const player = state.players.filter(p=> p.kind === 'human')[0];
+export default function UserControls({
+  state,
+  canAct,
+  dispatch
+}: {
+  state: GameState;
+  canAct: boolean;
+  dispatch: (action: PlayerAction) => void;
+}) {
+  const [isBetting, setIsBetting] = useState(false);
+  const player = state.players.find(p => p.kind === "human")!;
 
-        return (
-            <div className={styles['controls-container']}>
-                <div id={styles.controls}>
-                    <div>
-                        <h2>{player.name}</h2>
-                        <p>Chips: {player.chips}</p>
-                        <p>Current Bet: {state.currentBet}</p>
-                    </div>
-                    {canAct && state.phase === 'inHand' ? isBetting ? (
-                        <BettingControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
-                    ) : (
-                        <ActionControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
-                    ) : <div/> }
-                    <div className={styles.hand}>
-                        {player.hand.map((card: CardType, index: number) => (
-                            <div
-                                key={`user-card-${index}`}
-                                className={styles.cardWrapper}
-                                style={{ transform: `translateX(${index * 30}px)` }}
-                            >
-                                <Card card={card} />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+  return (
+    <div className={styles.controlsContainer}>
+      <div className={styles.controls}>
+        <div className={styles.userInfo}>
+          <h2>Pot: <span style={{ fontSize: "3rem"}}>${player.chips}</span></h2>
+        </div>
+
+        <div className={styles.actions}>
+          {canAct ? (
+            isBetting ? (
+              <BettingControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
+            ) : (
+              <ActionControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
+            )
+          ) : (
+            <div />
+          )}
+        </div>
+
+        <div className={styles.hand}>
+          {!player.folded && player.hand.map((card: CardType, index: number) => (
+            <div
+              key={`user-card-${index}`}
+              className={styles.cardWrapper}
+              style={{ left: `${index * 30}px` }}
+            >
+              <Card card={card} />
             </div>
-        );
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
