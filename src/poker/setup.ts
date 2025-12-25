@@ -12,6 +12,7 @@ export function initGame() : GameState {
             folded: false,
             currentBet: 0,
             totalBet: 0,
+            index: 0
         }
     ]
 
@@ -45,8 +46,11 @@ export function initGame() : GameState {
  */
 export function startGame(state: GameState, config: PregameConfig) : GameState {
     let players = state.players.map(p => ({ ...p })) as Player[];
-    players = [...players, ...config.players];
-    players.forEach(p => p.chips = config.buyIn);
+    config.players.forEach(p => players.push(p));
+    players.forEach((p, i) => {
+        p.chips = config.buyIn
+        p.index = i;
+    });
     return {
         ...state,
         playing: true,

@@ -48,11 +48,26 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
     inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-    0 10px 28px rgba(0, 0, 0, 0.45);
+    0 10px 28px rgba(0, 0, 0, 0.25);
 
   backdrop-filter: blur(6px);
 
   line-height: 1.1;
+
+  transition:
+    border-color 1000ms ease,
+    box-shadow 1000ms ease,
+    transform 1000ms ease,
+    background-color 1000ms ease;
+}
+
+.playerInfo.active {
+  border-color: #4ade80;
+  box-shadow:
+    0 0 0 2px rgba(74, 222, 128, 0.35),
+    0 0 18px rgba(74, 222, 128, 0.35),
+    0 10px 28px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px);
 }
 
 .playerInfo::before {
@@ -113,6 +128,35 @@
 .remove-bot:focus-visible {
   outline: 3px solid rgba(144, 238, 144, 0.6);
   outline-offset: 2px;
+}
+
+.dealer {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  background-color: #e11d48;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+
+  cursor: pointer;
+  padding: 0;
+
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.dealer::before {
+  content: "";
+  width: 12px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
 }
 
 .name {

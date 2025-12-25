@@ -30,6 +30,7 @@ export type BotProfile = "basic" | "random" | "tight" | "aggressive";
 
 export interface PlayerBase { 
     id: string;
+    index: number,
     name: string;
     chips: number;
     hand: [] | [Card] | [Card, Card];
@@ -37,6 +38,7 @@ export interface PlayerBase {
     currentBet: number;
     totalBet: number;
     action?: PlayerAction;
+    displayedAction?: string;
     handValue?: HandValue;
 }
 
@@ -45,6 +47,7 @@ export interface HumanPlayer extends PlayerBase {
 }
 
 export interface BotPlayer extends PlayerBase {
+    tableIndex: number,
     kind: "bot";
     botProfile: BotProfile;
 }

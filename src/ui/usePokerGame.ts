@@ -70,19 +70,16 @@ export function usePokerGame() {
     }, [dispatchEvent]);
 
     const startGame = useCallback((config: PregameConfig) => {
-        console.log("Start game callback.");
         clearAllTimers();
         dispatchEvent({ type: "INITIATE_GAME", config });
     }, [clearAllTimers, dispatchEvent]);
 
     const endGame = useCallback(() => {
-        console.log("Ending game...");
         clearAllTimers();
         dispatchEvent({ type: "END_GAME" });
     }, [clearAllTimers, dispatchEvent])
 
     const startHand = useCallback(() => {
-        console.log("Starting new hand...");
         clearAllTimers();
         dispatchEvent({ type: "START_NEXT_HAND" });
     }, [clearAllTimers, dispatchEvent]);

@@ -9,6 +9,7 @@
 import type { GameState, GameEffect, PlayerAction, GameEvent } from '../types';
 import { createDeck, shuffleDeck } from './deck';
 import { evaluateHands, compareHands } from './hand';
+import { actionToDisplay } from './lib/actions';
 import { initGame, startGame } from './setup';
 
 /**
@@ -43,7 +44,6 @@ import { initGame, startGame } from './setup';
 export function reduceGame(state: GameState, event: GameEvent) : { state: GameState; effects: GameEffect[] } {
     switch(event.type) {
         case "INITIATE_GAME": {
-            console.log("Initiating game...");
             const next = startGame(state, event.config);
             return {
                 state: next,
@@ -51,7 +51,6 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             }
         }
         case "START_NEXT_HAND": {
-            console.log("Starting hand...");
             const next = startHand(state);
             return {
                 state: next,
@@ -63,7 +62,6 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             if (state.phase !== "inHand") {
                 return { state, effects: [] };
             }
-            console.log(state);
 
             const next = applyAction(state, event.action);
 
@@ -72,14 +70,11 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
-                    console.log("One player standing...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
-                    console.log("Advancing street...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type: "ADVANCE_STREET" }, key: "street" }]};
                 }
-            console.log("Next player's turn.")
             return { state: next, effects: nextPlayerIsBot ? [{ type: "BOT_TURN_AFTER", ms: 2000, key: "bot" }] : [] };
         }
 
@@ -93,11 +88,9 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
-                    console.log("One player standing...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
-                    console.log("Advancing street...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type: "ADVANCE_STREET" }, key: "street" }]};
                 }
 
@@ -108,11 +101,9 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             if (state.phase !== "inHand") return { state, effects: [] };
             
             if (state.street === 'river' && readyToAdvanceStreet(state) == 2) {
-                console.log("Starting showdown...");
                 return { state: state, effects: [{ type: "AFTER", ms: 1000, event: { type: "START_SHOWDOWN" }, key: "hand" }]};
             }
             else {
-                console.log("Players to play...")
                 const next = advanceStreet(state);
                 const nextPlayerIsBot = next.phase === "inHand" && next.players[next.currentPlayer]?.kind === "bot";
 
@@ -125,7 +116,7 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             const next = { ...state, players: evaluateHands(state), phase: 'showdown' as const }
             return {
                 state: next,
-                effects: [{ type: "AFTER", ms: 1000, event: { type: "END_HAND" }, key: "hand" } ]
+                effects: [{ type: "AFTER", ms: 2000, event: { type: "END_HAND" }, key: "hand" } ]
             }
         }
 
@@ -171,28 +162,24 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
   const players = state.players.map(p => ({ ...p }));
   const i = state.currentPlayer;
   const player = players[i];
-  console.log(`${player.name}'s action: ${action.type}`);
 
   let pot = state.pot;
   let currentBet = state.currentBet;
 
   if (player.action !== undefined) {
     // already acted this round; ignore
-    console.log("")
     return state;
   }
-
+  
   switch(action.type) {
-    case "fold": {
-        console.log(`${player.name} folding...`)
-        player.folded = true;
+      case "fold": {
+          player.folded = true;
         player.action = { type: "fold" };
         player.currentBet = 0;
         player.totalBet = 0;
         break;
     }
     case "call": {
-        console.log(`${player.name} calling...`)
         const toCall = Math.max(0, currentBet - player.currentBet);
         const paid = Math.min(player.chips, toCall);
         player.chips -= paid;
@@ -203,8 +190,10 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         break;
     }
     case "bet": {
-        players.forEach(p => p.action = undefined);
-        console.log(`${player.name} betting...`)
+        players.forEach(p => {
+            p.displayedAction = undefined;
+            p.action = undefined
+        });
         const amt = Math.max(0, Math.min(player.chips, action.amount));
         player.chips -= amt;
         pot += amt;
@@ -215,10 +204,11 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         break;
     }
     case "all-in":
-    default:
-        break;
-  }
-
+        default:
+            break;
+    }
+        
+  player.displayedAction = actionToDisplay(state, action);
   let nextPlayer = (i + 1) % players.length;
   while (players[nextPlayer].folded) nextPlayer = (nextPlayer + 1) % players.length;
 
@@ -229,6 +219,15 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
     currentBet,
     currentPlayer: nextPlayer,
   };
+}
+
+function findFirstPlayer(state: GameState) : number {
+    const dealer = state.dealerButton;
+    let nextPlayer = (dealer + 1) % state.players.length;
+    while(state.players[nextPlayer].folded || nextPlayer !== dealer) {
+        nextPlayer = (nextPlayer + 1) % state.players.length;
+    }
+    return nextPlayer;
 }
 
 /**
@@ -266,50 +265,54 @@ export function startHand(state: GameState) : GameState {
         });
     }
 
-
-    return {
+    const nextDealer = findFirstPlayer(state);
+    const nextState : GameState = {
         ...state,
         deck,
         community: [],
         pot: 0,
         currentBet: 0,
-        currentPlayer: 0,
+        dealerButton: nextDealer,
         players,
         street: 'preflop',
         phase: 'inHand',
         handWinner: undefined
     }
+
+
+    return {
+        ...nextState,
+        currentPlayer: findFirstPlayer(nextState)
+    }
 }
 
-export function endHand(state: GameState) : GameState {
+export function endHand(state: GameState): GameState {
     const players = state.players.map(p => ({ ...p }));
-    const active = state.players.filter(p => !p.folded && p.handValue !== undefined);
+    const activeIndexes = players
+        .map((p, i) => ({ p, i }))
+        .filter(({ p }) => !p.folded && p.handValue !== undefined);
 
-    const winner = active.reduce((best, current) => 
-        compareHands(current.handValue!, best.handValue!) > 0 ? current : best
+    const winnerEntry = activeIndexes.reduce((best, current) =>
+        compareHands(current.p.handValue!, best.p.handValue!) > 0 ? current : best
     );
-    const winner_index = players.findIndex(p => p === winner);
-    winner.chips += state.pot;
-    players[winner_index] = winner;
 
-    return { 
+    players[winnerEntry.i].chips += state.pot;
+
+    return {
         ...state,
         pot: 0,
         currentBet: 0,
-        phase: 'handOver',
+        phase: "handOver",
         players,
-        handWinner: winner_index,
+        handWinner: winnerEntry.i
     };
 }
 
 function readyToAdvanceStreet(state : GameState) : number {
     const active = state.players.filter(p => !p.folded);
-    console.log("Active players: ", active.length);
     if (active.length === 1) return 1;
     const allPlayersActed = active.every(p => p.action !== undefined);
-    console.log("All players acted: ", allPlayersActed);
     const allPlayersMatched = active.every(p => p.currentBet === state.currentBet);
-    console.log("All players matched: ", allPlayersMatched);
     if (allPlayersActed && allPlayersMatched) return 2;
     return 0;
 
@@ -320,11 +323,11 @@ export function advanceStreet(state : GameState) : GameState {
     const community = [...state.community];
     const deck = [...state.deck];
     let street = state.street;
+    const nextPlayer = findFirstPlayer(state);
 
     if (state.players.every(p => p.action === undefined )) return { ...state };
     
     if (street === 'preflop' && community.length === 0) {
-        console.log("Flopping...")
         for (let i = 0; i < 3; ++i) {
             const card = deck.pop();
             if (card) community.push(card);
@@ -332,33 +335,34 @@ export function advanceStreet(state : GameState) : GameState {
         street = 'flop';
         players.forEach(p => {
             p.action = undefined;
+            p.displayedAction = undefined;
             p.currentBet = 0;
         });
-        return { ...state, street, community, deck, players, currentBet: 0 };
+        return { ...state, street, community, deck, players, currentBet: 0, currentPlayer: nextPlayer };
     }
 
     else if (street === 'flop' && community.length === 3) {
-        console.log("turning...")
         const card = deck.pop();
         if (card) community.push(card);
         street = 'turn';
         players.forEach(p => {
             p.action = undefined;
+            p.displayedAction = undefined;
             p.currentBet = 0;
         });
-        return { ...state, street, community, deck, players, currentBet: 0 };
+        return { ...state, street, community, deck, players, currentBet: 0, currentPlayer: nextPlayer };
     }
 
     else if (street === 'turn' && community.length === 4) {
-        console.log("rivering...")
         const card = deck.pop();
         if (card) community.push(card);
         street = 'river';
         players.forEach(p => {
             p.action = undefined;
+            p.displayedAction = undefined;
             p.currentBet = 0;
         });
-        return { ...state, street, community, deck, players, currentBet: 0 };
+        return { ...state, street, community, deck, players, currentBet: 0, currentPlayer: nextPlayer };
     }
 
     return { ...state };

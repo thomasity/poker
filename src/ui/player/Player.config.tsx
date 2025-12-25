@@ -1,12 +1,13 @@
 import styles from './Player.module.css';
 
 export default function Player({
-    position,
+    index,
     removeBot
 }: {
-    position: string;
-    removeBot?: () => void;
+    index: number;
+    removeBot?: (index: number) => void;
 }) {
+    const position = `bot${index+1}`
     return (
         <div className={`${styles.player} ${styles[position]}`}>
             <div className={styles.playerInfo}>
@@ -17,7 +18,7 @@ export default function Player({
                 <p className={styles.bet}>
                     Total Bet: 0
                 </p>
-                {removeBot && <button className={styles['remove-bot']} onClick={removeBot} />}
+                {removeBot && <button className={styles['remove-bot']} onClick={() => removeBot(index)} />}
             </div>
         </div>
     );

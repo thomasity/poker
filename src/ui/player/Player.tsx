@@ -1,21 +1,22 @@
-import type { Player as PlayerType, Card as CardType } from '../../types';
+import { actionToDisplay } from '../../poker/lib/actions';
+import type { Player as PlayerType, Card as CardType, BotPlayer, GameState } from '../../types';
 import Card from '../cards/Card';
 import styles from './Player.module.css';
 
 export default function Player({
-    position,
     show,
-    player
+    player,
+    state
 }: {
-    position: string;
     show: boolean;
-    player: PlayerType;
+    player: BotPlayer;
+    state: GameState;
 }) {
-    const actionLabel =
-    player.action?.type === "bet" ? `Bet` :
-    player.action?.type === "call" ? `Call` :
-    player.action?.type === "fold" ? `Fold` :
-    player.action?.type ?? "";
+
+    const isActive = state.phase === "inHand" && player.index === state.currentPlayer;
+    const isDealer = state.dealerButton === player.tableIndex+1;
+
+    const position = `bot${player.tableIndex}`
 
     return (
         <div className={`${styles.player} ${styles[position]}`}>
@@ -33,7 +34,7 @@ export default function Player({
                         </div>
                 )})}
             </div>
-            <div className={styles.playerInfo}>
+            <div className={`${styles.playerInfo} ${isActive ? styles.active: ""}`}>
                 <h2 className={styles.name}>{player.name}</h2>
                 <p className={styles.chips}>
                     Chips: {player.chips}
@@ -41,10 +42,11 @@ export default function Player({
                 <p className={styles.bet}>
                     Total Bet: {player.totalBet}
                 </p>
+                {isDealer && <div className={styles['dealer']} />}
             </div>
-            {actionLabel && 
+            {player.displayedAction && 
                 <div className={styles.actionPopup} role="status" aria-live="polite">
-                    {actionLabel}
+                    {player.displayedAction}
                 </div>
             }
         </div>

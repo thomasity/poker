@@ -9,20 +9,17 @@ export default function PokerTable({ state } : { state: GameState; }) {
     const [show, setShow] = useState<boolean>(false);
 
     useEffect(() => {
-        if (state.phase === 'showdown') setShow(true);
-        if (state.phase === 'inHand') setShow(false);
+        if (state.phase === 'showdown' && show === false) setShow(true);
+        if (state.phase === 'inHand' && show === true) setShow(false);
     }, [state] );
 
     const opponents = state.players.filter(p => p.kind === 'bot')
-    if (!state) {
-        return <div id={styles.table}></div>;
-    }
+
     return (
         <div id={styles.table}>
             {opponents.map((p, i) => {
-                const position = `bot${i+1}`
                 return(
-                    <Player position={position} player={p} show={show}/>
+                    <Player key={`bot-${i}`} player={p} show={show} state={state} />
                 )
             })}
             <div className={styles['table-content']}>

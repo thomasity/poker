@@ -110,7 +110,7 @@ export default function UserControls({
 
   return (
     <div className={styles.controlsContainer}>
-      <div className={styles.controls}>
+      <div className={`${styles.controls} ${canAct ? styles.active : "" }`}>
         <div className={styles.userInfo}>
           <h2>Pot: <span style={{ fontSize: "3rem"}}>${player.chips}</span></h2>
         </div>

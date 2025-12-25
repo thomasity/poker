@@ -7,38 +7,48 @@ import styles from './PokerTable.module.css';
 
 
 export default function PokerTable({ state, startGame } : { state: GameState; startGame: (config: PregameConfig) => void; }) {
-    const [opponents, setOpponents] = useState<BotPlayer[]>(state.players.filter(p => p.kind === 'bot'));
+    const [opponents, setOpponents] = useState<(BotPlayer | null)[]>(new Array(5).fill(null));
     const [error, setError] = useState<string>("");
 
     const handleStartGame = (config: PregameConfig) => {
-        if (opponents.length === 0) {
+        if (opponents.every(o => o === null)) {
             setError("Cannot begin game without bot opponents.");
         }
         else {
-            config.players = opponents;
+            const players = opponents.filter(o => o !== null);
             setError("");
-            startGame(config);
+            startGame({ ...config, players } );
         }
     }
 
-    const addBot = () => {
+    const addBot = (index: number) => {
         setError("");
         const bot :  BotPlayer = {
-            id: `${opponents.length + 1}`,
-            name: `Bot ${opponents.length + 1}`,
+            id: `${index}`,
+            name: `Bot ${index}`,
+            index: index,
             chips: 1000,
             hand: [],
             folded: false,
             currentBet: 0,
             totalBet: 0,
             kind: "bot",
-            botProfile: "basic"
+            botProfile: "basic",
+            tableIndex: index + 1
         }
-        setOpponents([...opponents, bot]);
+        setOpponents(prev => {
+            const next = [...prev];
+            next[index] = {...bot};
+            return next;
+        })
     }
 
-    const removeBot = () => {
-        setOpponents(prev => prev.slice(0, -1));
+    const removeBot = (index: number) => {
+        setOpponents(prev => {
+            const next = [...prev];
+            next[index] = null;
+            return next;
+        })
     }
 
     if (!state) {
@@ -46,22 +56,19 @@ export default function PokerTable({ state, startGame } : { state: GameState; st
     }
     return (
         <div id={styles.table}>
-            {Array.from({ length: Math.min(opponents.length + 1, 5) }).map((_, index) => {
+            {Array.from({ length: 5 }).map((_, index) => {
                 const bot = opponents[index];
-                const position = `bot${index + 1}`
 
-                return bot ? (
-                    <div>
-                        <Player
+                return (bot !== null) ? (
+                    <Player
                         key={`bot-${index}`}
-                        position={position}
-                        removeBot={index === opponents.length - 1 ? removeBot : undefined}
-                        />
-                    </div>
+                        index={index}
+                        removeBot={removeBot}
+                    />
                 ) : (
                     <AddBotButton
                         key={`add-bot-${index}`}
-                        position={position}
+                        index={index}
                         onClick={addBot}
                     />
                 );

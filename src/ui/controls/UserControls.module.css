@@ -23,6 +23,20 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  transition:
+    border-color 500ms ease,
+    box-shadow 500ms ease,
+    transform 500ms ease,
+    background-color 500ms ease;
+}
+
+.active {
+  border-color: #4ade80;
+  box-shadow:
+    0 0 0 2px rgba(74, 222, 128, 0.35),
+    0 0 24px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px);
 }
 
 .userInfo {
