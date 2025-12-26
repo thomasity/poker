@@ -1,4 +1,4 @@
-import type { GameState, Player, PlayerAction } from "../../types";
+import type { GameState, PlayerAction } from "../../types";
 
 
 export function actionToDisplay(state: GameState, action?: PlayerAction) : string {

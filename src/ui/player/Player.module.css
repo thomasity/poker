@@ -141,23 +141,48 @@
   display: grid;
   place-items: center;
 
-  background-color: #e11d48;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.85);
+  /* Chip base */
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ffffff,
+    #f1f1f1 55%,
+    #d9d9d9 100%
+  );
 
-  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid #1f2937; /* dark rim */
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.6);
+
   padding: 0;
 
-  transition: transform 120ms ease, filter 120ms ease;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    box-shadow 120ms ease;
 }
 
+/* Inner ring */
 .dealer::before {
   content: "";
-  width: 12px;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
+  position: absolute;
+  inset: 4px;
+
+  border-radius: 50%;
+  border: 1.5px solid #111827;
 }
+
+.dealer::after {
+  content: "D";
+  font-size: 11px;
+  font-weight: 800;
+  font-family: system-ui, sans-serif;
+  color: #111827;
+  line-height: 1;
+}
+
 
 .name {
   margin: 0;

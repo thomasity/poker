@@ -16,13 +16,23 @@ const HAND_CATEGORIES: Record<number, string> = {
 export default function ClickAnywhere({ state, onClick } : { state: GameState, onClick: () => void; }) {
     const HandOutcome = ({ className } : { className: string}) => {
         if (state.handWinner !== undefined) {
-            return (
-                <div className={className}>
-                    <p>Winner: {state.players[state.handWinner].name}</p>
-                    <p>Winning Hand: {HAND_CATEGORIES[state.players[state.handWinner].handValue!.category] ?? "Unknown"}</p>
-                    <p>Winnings: {state.pot}</p>
-                </div>
-            )
+            if (state.players[state.handWinner].handValue !== undefined) {
+                return (
+                    <div className={className}>
+                        <p>Winner: {state.players[state.handWinner].name}</p>
+                        <p>Winning Hand: {HAND_CATEGORIES[state.players[state.handWinner].handValue!.category] ?? "Unknown"}</p>
+                        <p>Winnings: {state.pot}</p>
+                    </div>
+                )
+            }
+            else {
+                return (
+                    <div className={className}>
+                        <p>Winner: {state.players[state.handWinner].name}</p>
+                        <p>Winnings: {state.pot}</p>
+                    </div>
+                )
+            }
         }
         return null;
     }

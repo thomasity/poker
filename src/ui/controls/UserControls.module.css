@@ -1,6 +1,7 @@
 .controlsContainer {
   width: 100%;
   z-index: 1000;
+  margin-bottom: 12px;
 
   display: flex;
   justify-content: center;
@@ -76,3 +77,45 @@
   transform: translateY(-10px);
   z-index: 10;
 }
+
+.displayedAction {
+  position: absolute;
+  bottom: calc(15%);
+  z-index: 2000;
+  left: 50%;
+  transform: translateX(-50%);
+  height: fit-content;
+  max-width: 80%;
+
+  padding: 6px 14px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: #f8fafc;
+  background: rgba(17, 24, 39, 0.85);
+  border-radius: 9999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+

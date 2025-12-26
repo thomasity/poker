@@ -16,9 +16,7 @@ export function initGame() : GameState {
         }
     ]
 
-    const dealerButton = players.findIndex(p => p.kind === "human");
-    const smallBlind = players.length > 2 ? (dealerButton + 1) % players.length : dealerButton;
-    const bigBlind = (smallBlind + 1) % players.length;
+    const dealerButton = -1;
 
     return {
         playing: false,
@@ -27,11 +25,11 @@ export function initGame() : GameState {
         players,
         street: 'preflop',
         pot: 0,
-        bigBlind,
-        smallBlind,
+        bigBlind: 10,
+        smallBlind: 5,
         dealerButton,
         currentBet: 0,
-        currentPlayer: smallBlind,
+        currentPlayer: (dealerButton + 1) % players.length,
         phase: 'handOver',
         isGameOver: false
     }

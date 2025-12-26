@@ -51,11 +51,14 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             }
         }
         case "START_NEXT_HAND": {
+            console.log("Starting new hand...");
             const next = startHand(state);
-            return {
-                state: next,
-                effects: []
-            }
+            console.log(next);
+            const nextPlayerIsBot = next.phase === "inHand" && next.players[next.currentPlayer]?.kind === "bot";
+            console.log("next player is bot?: ", nextPlayerIsBot);
+            console.log("next current player index: ", next.currentPlayer);
+            console.log(next.players[next.currentPlayer]);
+            return { state: next, effects: nextPlayerIsBot ? [{ type: "BOT_TURN_AFTER", ms: 2000, key: "bot" }] : [] };
         }
         
         case "PLAYER_ACTION": {
@@ -70,6 +73,8 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
+                    console.log("ending game...")
+                    console.log(next);
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
@@ -88,6 +93,7 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
+                    console.log("ending game...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
@@ -217,14 +223,14 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
     players,
     pot,
     currentBet,
-    currentPlayer: nextPlayer,
+    currentPlayer: (players[nextPlayer].action === undefined) ? nextPlayer : state.currentPlayer,
   };
 }
 
 function findFirstPlayer(state: GameState) : number {
     const dealer = state.dealerButton;
     let nextPlayer = (dealer + 1) % state.players.length;
-    while(state.players[nextPlayer].folded || nextPlayer !== dealer) {
+    while(state.players[nextPlayer].folded) {
         nextPlayer = (nextPlayer + 1) % state.players.length;
     }
     return nextPlayer;
@@ -245,6 +251,7 @@ export function startHand(state: GameState) : GameState {
         p.currentBet = 0;
         p.totalBet = 0;
         p.action = undefined;
+        p.displayedAction = undefined;
         p.folded = false;
         p.hand = [];
         p.handValue = undefined;
@@ -264,8 +271,8 @@ export function startHand(state: GameState) : GameState {
             }
         });
     }
-
-    const nextDealer = findFirstPlayer(state);
+    const nextDealer = (state.dealerButton + 1) % players.length;
+    const firstToPlay = (nextDealer + 1) % players.length;
     const nextState : GameState = {
         ...state,
         deck,
@@ -273,6 +280,7 @@ export function startHand(state: GameState) : GameState {
         pot: 0,
         currentBet: 0,
         dealerButton: nextDealer,
+        currentPlayer: firstToPlay,
         players,
         street: 'preflop',
         phase: 'inHand',
@@ -281,8 +289,7 @@ export function startHand(state: GameState) : GameState {
 
 
     return {
-        ...nextState,
-        currentPlayer: findFirstPlayer(nextState)
+        ...nextState
     }
 }
 
@@ -290,13 +297,20 @@ export function endHand(state: GameState): GameState {
     const players = state.players.map(p => ({ ...p }));
     const activeIndexes = players
         .map((p, i) => ({ p, i }))
-        .filter(({ p }) => !p.folded && p.handValue !== undefined);
+        .filter(({ p }) => !p.folded);
+    
+    let winnerEntry = 0;
+    
+    if (activeIndexes.length === 1) winnerEntry = activeIndexes[0].i;
+    else {
+        winnerEntry = activeIndexes.reduce((best, current) =>
+            compareHands(current.p.handValue!, best.p.handValue!) > 0 ? current : best
+        ).i;
+    }
 
-    const winnerEntry = activeIndexes.reduce((best, current) =>
-        compareHands(current.p.handValue!, best.p.handValue!) > 0 ? current : best
-    );
+    console.log("Winner index: ", winnerEntry);
 
-    players[winnerEntry.i].chips += state.pot;
+    players[winnerEntry].chips += state.pot;
 
     return {
         ...state,
@@ -304,7 +318,7 @@ export function endHand(state: GameState): GameState {
         currentBet: 0,
         phase: "handOver",
         players,
-        handWinner: winnerEntry.i
+        handWinner: winnerEntry
     };
 }
 

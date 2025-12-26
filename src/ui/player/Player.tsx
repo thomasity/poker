@@ -14,7 +14,7 @@ export default function Player({
 }) {
 
     const isActive = state.phase === "inHand" && player.index === state.currentPlayer;
-    const isDealer = state.dealerButton === player.tableIndex+1;
+    const isDealer = state.dealerButton === player.index;
 
     const position = `bot${player.tableIndex}`
 
