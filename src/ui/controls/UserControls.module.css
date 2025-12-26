@@ -2,7 +2,7 @@
   width: 100%;
   z-index: 1000;
   margin-bottom: 12px;
-
+  position: relative;
   display: flex;
   justify-content: center;
 
@@ -80,7 +80,7 @@
 
 .displayedAction {
   position: absolute;
-  bottom: calc(15%);
+  bottom: calc(100% + 16px);
   z-index: 2000;
   left: 50%;
   transform: translateX(-50%);
@@ -89,7 +89,7 @@
 
   padding: 6px 14px;
 
-  font-size: 0.9rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -118,4 +118,46 @@
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+.bet {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.95),
+    rgba(22, 163, 74, 0.95)
+  );
+  border-color: rgba(34, 197, 94, 0.9);
+
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.35),
+    0 6px 16px rgba(34, 197, 94, 0.45);
+}
+
+.call {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.95),
+    rgba(37, 99, 235, 0.95)
+  );
+  border-color: rgba(59, 130, 246, 0.85);
+
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.35),
+    0 6px 16px rgba(59, 130, 246, 0.45);
+}
+
+.fold {
+  background: linear-gradient(
+    135deg,
+    rgba(107, 114, 128, 0.95),
+    rgba(55, 65, 81, 0.95)
+  );
+  border-color: rgba(107, 114, 128, 0.8);
+
+  box-shadow:
+    0 0 0 1px rgba(107, 114, 128, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.45);
+
+  opacity: 0.85;
+}
+
 

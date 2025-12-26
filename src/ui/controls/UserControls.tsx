@@ -107,16 +107,19 @@ export default function UserControls({
 }) {
   const [isBetting, setIsBetting] = useState(false);
   const player = state.players.find(p => p.kind === "human")!;
+  const actionStyle = player.displayedAction ? player.displayedAction[0] === "B" || player.displayedAction[0] === "R" ? "bet" :
+                      player.displayedAction[0] === "F" ? "fold" :
+                      "call" : "";
 
   return (
     <div className={styles.controlsContainer}>
-      <div
-        className={`${styles.displayedAction} ${
-          player.displayedAction ? styles.visible : ""
-        }`}
-      >
-        {player.displayedAction}
-      </div>
+        <div
+          className={`${styles.displayedAction} ${styles[actionStyle] ?? ""} ${
+            player.displayedAction ? styles.visible : ""
+          }`}
+        >
+          {player.displayedAction}
+        </div>
       <div className={`${styles.controls} ${canAct ? styles.active : "" }`}>
         <div className={styles.userInfo}>
           <h2>Pot: <span style={{ fontSize: "3rem"}}>${player.chips}</span></h2>

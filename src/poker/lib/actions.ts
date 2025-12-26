@@ -16,9 +16,7 @@ export function actionToDisplay(state: GameState, action?: PlayerAction) : strin
         
         case "bet":
             if (state.currentBet === 0) return `Bet $${action.amount}`;
-
-            const raiseBy = Math.max(0, action.amount ?? 0);
-            return raiseBy > 0 ? `Raise $${raiseBy}` : "Raise";
+            return `Raise to $${action.amount}`;
         
         default:
             return "";

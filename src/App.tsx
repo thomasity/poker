@@ -10,6 +10,9 @@ export default function App() {
   return (
     <div className="page-wrapper">
         { state.phase === 'handOver' && state.playing && <ClickAnywhere state={state} onClick={startHand} /> }
+        {/* <div id="debug" style={{ position: 'absolute', top: 0, left: 0, maxHeight: '50vh', overflowY: 'scroll', fontSize: '10px' }}>
+            <pre>{JSON.stringify(state, null, 2)}</pre>
+        </div> */}
         <header>
             <div/>
             <h1 id="title">Poker Game</h1>

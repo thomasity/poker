@@ -1,8 +1,8 @@
 /**
  * Poker  Engine
  * - reduceGame
- * - startHand / endHand / startShowdown
  * - applyAction
+ * - startHand / endHand
  * - advanceStreet / readyToAdvanceStreet
  */
 
@@ -51,13 +51,12 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             }
         }
         case "START_NEXT_HAND": {
-            console.log("Starting new hand...");
+            console.info("Starting new hand...");
             const next = startHand(state);
-            console.log(next);
             const nextPlayerIsBot = next.phase === "inHand" && next.players[next.currentPlayer]?.kind === "bot";
-            console.log("next player is bot?: ", nextPlayerIsBot);
-            console.log("next current player index: ", next.currentPlayer);
-            console.log(next.players[next.currentPlayer]);
+            console.debug("next player is bot?: ", nextPlayerIsBot);
+            console.debug("next current player index: ", next.currentPlayer);
+            console.debug(next.players[next.currentPlayer]);
             return { state: next, effects: nextPlayerIsBot ? [{ type: "BOT_TURN_AFTER", ms: 2000, key: "bot" }] : [] };
         }
         
@@ -73,8 +72,6 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
-                    console.log("ending game...")
-                    console.log(next);
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
@@ -93,13 +90,12 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             switch(readyToAdvanceStreet(next)) {
                 case 1:
                     // Everyone else has folded. Winner takes all. No need for showdown.
-                    console.log("ending game...")
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type:"END_HAND" }, key: "hand" }]};
                 case 2:
                     // Multiple players still active and everyone has matched current bet. Advance Street.
                     return { state: next, effects: [{ type: "AFTER", ms: 1000, event: { type: "ADVANCE_STREET" }, key: "street" }]};
                 }
-
+            
             return { state: next, effects: nextPlayerIsBot ? [{ type: "BOT_TURN_AFTER", ms: 2000, key: "bot" }] : [] };
         }
 
@@ -107,6 +103,7 @@ export function reduceGame(state: GameState, event: GameEvent) : { state: GameSt
             if (state.phase !== "inHand") return { state, effects: [] };
             
             if (state.street === 'river' && readyToAdvanceStreet(state) == 2) {
+                console.info("Starting showdown...")
                 return { state: state, effects: [{ type: "AFTER", ms: 1000, event: { type: "START_SHOWDOWN" }, key: "hand" }]};
             }
             else {
@@ -179,23 +176,29 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
   
   switch(action.type) {
       case "fold": {
-          player.folded = true;
+        // Player has folded. Set their bets to zero, the folded status to true, and set their action as 'fold'.
+        console.info(`Player ${player.name} folds.`);
+        player.folded = true;
         player.action = { type: "fold" };
         player.currentBet = 0;
         player.totalBet = 0;
         break;
     }
     case "call": {
+        // Player calls the current table bet. Deduct chips, update pot and player's bets, and set action as 'call'.
+        console.info(`Player ${player.name} calls.`);
         const toCall = Math.max(0, currentBet - player.currentBet);
         const paid = Math.min(player.chips, toCall);
         player.chips -= paid;
         pot += paid;
-        player.currentBet = paid;
+        player.currentBet += paid;
         player.totalBet += paid;
         player.action = { type: "call" };
         break;
     }
     case "bet": {
+        // Player places a bet/raise. Clear all other players' actions, update pot/currentBet, deduct chips from player, and set action as 'bet'.
+        console.info(`Player ${player.name} bets $${action.amount}.`);
         players.forEach(p => {
             p.displayedAction = undefined;
             p.action = undefined
@@ -227,7 +230,12 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
   };
 }
 
-function findFirstPlayer(state: GameState) : number {
+/**
+ * 
+ * @param state - GameState prior to starting new round of bets.
+ * @returns - Index of first player to act after dealer.
+ */
+function findFirstPlayerAfterDealer(state: GameState) : number {
     const dealer = state.dealerButton;
     let nextPlayer = (dealer + 1) % state.players.length;
     while(state.players[nextPlayer].folded) {
@@ -273,7 +281,8 @@ export function startHand(state: GameState) : GameState {
     }
     const nextDealer = (state.dealerButton + 1) % players.length;
     const firstToPlay = (nextDealer + 1) % players.length;
-    const nextState : GameState = {
+
+    return {
         ...state,
         deck,
         community: [],
@@ -286,14 +295,10 @@ export function startHand(state: GameState) : GameState {
         phase: 'inHand',
         handWinner: undefined
     }
-
-
-    return {
-        ...nextState
-    }
 }
 
 export function endHand(state: GameState): GameState {
+    console.info("Ending hand...");
     const players = state.players.map(p => ({ ...p }));
     const activeIndexes = players
         .map((p, i) => ({ p, i }))
@@ -308,7 +313,7 @@ export function endHand(state: GameState): GameState {
         ).i;
     }
 
-    console.log("Winner index: ", winnerEntry);
+    console.debug("Winner index: ", winnerEntry);
 
     players[winnerEntry].chips += state.pot;
 
@@ -324,10 +329,17 @@ export function endHand(state: GameState): GameState {
 
 function readyToAdvanceStreet(state : GameState) : number {
     const active = state.players.filter(p => !p.folded);
-    if (active.length === 1) return 1;
+    if (active.length === 1) {
+        console.info("Only one player remaining; ready to end hand.")
+        return 1;
+    }
     const allPlayersActed = active.every(p => p.action !== undefined);
     const allPlayersMatched = active.every(p => p.currentBet === state.currentBet);
-    if (allPlayersActed && allPlayersMatched) return 2;
+    if (allPlayersActed && allPlayersMatched) {
+        console.info("All active players have matched the current bet; ready to advance street.")
+        return 2;
+    }
+    console.info("Not ready to advance street yet.");
     return 0;
 
 }
@@ -337,11 +349,15 @@ export function advanceStreet(state : GameState) : GameState {
     const community = [...state.community];
     const deck = [...state.deck];
     let street = state.street;
-    const nextPlayer = findFirstPlayer(state);
+    const nextPlayer = findFirstPlayerAfterDealer(state);
 
-    if (state.players.every(p => p.action === undefined )) return { ...state };
+    if (state.players.every(p => p.action === undefined )) {
+        console.warn("Cannot advance street: no player has acted yet.");
+        return { ...state };
+    }
     
     if (street === 'preflop' && community.length === 0) {
+        console.info("Advancing to flop...");
         for (let i = 0; i < 3; ++i) {
             const card = deck.pop();
             if (card) community.push(card);
@@ -356,6 +372,7 @@ export function advanceStreet(state : GameState) : GameState {
     }
 
     else if (street === 'flop' && community.length === 3) {
+        console.info("Advancing to turn...");
         const card = deck.pop();
         if (card) community.push(card);
         street = 'turn';
@@ -368,6 +385,7 @@ export function advanceStreet(state : GameState) : GameState {
     }
 
     else if (street === 'turn' && community.length === 4) {
+        console.info("Advancing to river...");
         const card = deck.pop();
         if (card) community.push(card);
         street = 'river';
