@@ -1,5 +1,4 @@
-import { actionToDisplay } from '../../poker/lib/actions';
-import type { Player as PlayerType, Card as CardType, BotPlayer, GameState } from '../../types';
+import type { Card as CardType, BotPlayer, GameState } from '../../types';
 import Card from '../cards/Card';
 import styles from './Player.module.css';
 
