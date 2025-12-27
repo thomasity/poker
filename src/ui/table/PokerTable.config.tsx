@@ -4,7 +4,6 @@ import Player from '../player/Player.config';
 import AddBotButton from '../config/AddBotButton';
 import { TableConfigForm } from '../config/TableConfigForm';
 import styles from './PokerTable.module.css';
-import { reduceGame } from '../../poker';
 
 
 export default function PokerTable({ state, startGame } : { state: GameState; startGame: (config: PregameConfig) => void; }) {
