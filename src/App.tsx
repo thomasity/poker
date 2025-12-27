@@ -15,7 +15,7 @@ export default function App() {
         </div> */}
         <header>
             <div/>
-            <h1 id="title">Poker Game</h1>
+            <h1 id="title" style={{ lineHeight: '0.25'}}>Poker Game <br/><span style={{ fontSize: '12px', lineHeight: '0' }}>*This game is nowhere close to being fully complete/functional at the moment.<br/>Plz do not go all-in, assume big/small blinds do anything, or try running this on mobile...</span></h1>
             {state.playing && <button onClick={endGame}>New Game</button>}
         </header>
         <main>
