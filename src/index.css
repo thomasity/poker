@@ -31,17 +31,28 @@ body {
   display: grid;
   grid-template-rows: auto 2fr auto;
   place-items: center;
+  place-content: center;
   overflow: hidden;
+}
+
+#logo {
+  height: auto;
+  width: 128px;
+  padding: 0 1rem;
+  margin: 0;
+  border-right: 1px solid rgba(255, 255, 255);
+  justify-self: start;
 }
 
 header {
   height: 100%;
   width: 100%;
-  line-height: 1.15;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  place-items: center;
-  place-content: center;
+  justify-items: center;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
 }
 
 header>* {

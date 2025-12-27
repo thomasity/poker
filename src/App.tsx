@@ -14,9 +14,13 @@ export default function App() {
             <pre>{JSON.stringify(state, null, 2)}</pre>
         </div> */}
         <header>
-            <div/>
-            <h1 id="title" style={{ lineHeight: '0.25'}}>Poker Game <br/><span style={{ fontSize: '12px', lineHeight: '0' }}>*This game is nowhere close to being fully complete/functional at the moment.<br/>Plz do not go all-in, assume big/small blinds do anything, or try running this on mobile...</span></h1>
-            {state.playing && <button onClick={endGame}>New Game</button>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', justifyContent: 'center' }}>
+              <a id="logo" href="https://tommycallen.com"><img src='/logo.png' alt='Logo' width={128} /></a>
+              <h1 id="title" style={{ lineHeight: '0.25'}}>Poker Game <span style={{ fontSize: '12px', lineHeight: '0' }}><br />*This game is nowhere close to being fully complete/functional at the moment. Plz do not go all-in, assume big/small blinds do anything, or try running this on mobile...</span></h1>
+            </div>
+            <div style={{ gridColumn: '3', justifySelf: 'center' }}>
+            {state.playing ? <button onClick={endGame}>New Game</button> : <div />}
+            </div>
         </header>
         <main>
             {state.playing ? <PokerTable state={state} /> : <ConfigTable state={state} startGame={startGame} />}
