@@ -110,6 +110,7 @@ export default function UserControls({
   const actionStyle = player.displayedAction ? player.displayedAction[0] === "B" || player.displayedAction[0] === "R" ? "bet" :
                       player.displayedAction[0] === "F" ? "fold" :
                       "call" : "";
+  const isDealer = state.dealerButton !== undefined ? state.dealerButton === player.index : false;
 
   return (
     <div className={styles.controlsContainer}>
@@ -123,6 +124,7 @@ export default function UserControls({
       <div className={`${styles.controls} ${canAct ? styles.active : "" }`}>
         <div className={styles.userInfo}>
           <h2>Pot: <span style={{ fontSize: "3rem"}}>${player.chips}</span></h2>
+          {isDealer && <div>Dealer</div>}
         </div>
 
         <div className={styles.actions}>

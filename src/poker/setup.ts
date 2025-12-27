@@ -53,5 +53,6 @@ export function startGame(state: GameState, config: PregameConfig) : GameState {
         ...state,
         playing: true,
         players: players,
+        phase: 'dealing',
     }
 }

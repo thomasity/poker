@@ -24,7 +24,6 @@ export default function PokerTable({ state } : { state: GameState; }) {
             })}
             <div className={styles['table-content']}>
                 <h2>Pot: ${state.pot}</h2>
-                {state.currentBet > 0 && <p>Amount to call: {state.currentBet}</p>}
                 <div className={styles.community}>
                     {state.community.map((c, i) => {
                         return(
@@ -33,7 +32,6 @@ export default function PokerTable({ state } : { state: GameState; }) {
                     })
                     }
                 </div>
-                <p>Whose turn: {state.players[state.currentPlayer].name} - Phase: {state.phase} - Street: {state.street}</p>
             </div>
         </div>
     )

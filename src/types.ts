@@ -19,9 +19,9 @@ export interface HandValue {
 }
 
 export interface HandOutcome {
-    winner_index: number;
+    winnerIndex: number;
     amount: number;
-    winningHand: HandCategory;
+    winningHand: string;
 }
 
 export type PlayerAction = { type: 'call' } | { type: 'bet'; amount: number } | { type: 'fold' } | { type: 'all-in' };
@@ -56,7 +56,7 @@ export type Player = HumanPlayer | BotPlayer;
 
 export type Street = 'preflop' | 'flop' | 'turn' | 'river';
 
-export type Phase = 'inHand' | 'handOver' | 'showdown' | 'dealing' ;
+export type Phase = 'inHand' | 'handOver' | 'showdown' | 'dealing' | 'ending';
 
 export type PregameConfig = {
     players: Player[],
@@ -92,7 +92,7 @@ export interface GameState {
     dealerButton: number;
     currentBet: number;
     currentPlayer: number;
-    handWinner?: number
+    winnerInfo?: HandOutcome;
     phase: Phase;
     isGameOver: boolean;
 }

@@ -168,3 +168,20 @@ export function evaluateHands(state: GameState) : Player[] {
     });
     return players;
 }
+
+export function handToString(handValue: HandValue) : string {
+
+    const HAND_CATEGORIES: Record<number, string> = {
+        8: "Straight Flush",
+        7: "Four of a Kind",
+        6: "Full House",
+        5: "Flush",
+        4: "Straight",
+        3: "Three of a Kind",
+        2: "Two Pair",
+        1: "One Pair",
+        0: "High Card"
+    }
+    let result = HAND_CATEGORIES[handValue.category] ?? "Unknown Hand";
+    return result;
+}
