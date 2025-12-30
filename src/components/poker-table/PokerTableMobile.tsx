@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import type { GameState } from '../../types'
 import Card from '../cards/Card';
 import Player from '../player/Player';
@@ -6,13 +5,7 @@ import styles from './PokerTable.module.css';
 
 
 export function PokerTableMobile({ state } : { state: GameState; }) {
-    const [show, setShow] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (state.phase === 'showdown' && show === false) setShow(true);
-        if (state.phase === 'inHand' && show === true) setShow(false);
-    }, [state] );
-
+    const show = state.phase === 'showdown' || state.phase === 'ending' || state.phase === 'handOver';
     const opponents = state.players.filter(p => p.kind === 'bot')
 
     return (

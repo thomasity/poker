@@ -182,6 +182,6 @@ export function handToString(handValue: HandValue) : string {
         1: "One Pair",
         0: "High Card"
     }
-    let result = HAND_CATEGORIES[handValue.category] ?? "Unknown Hand";
+    const result = HAND_CATEGORIES[handValue.category] ?? "Unknown Hand";
     return result;
 }

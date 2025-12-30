@@ -1,6 +1,5 @@
 import type { Card as CardType, BotPlayer, GameState } from '../../types';
 import Card from '../cards/Card';
-import useIsMobile from '../hooks/useIsMobile';
 import styles from './Player.module.css';
 
 export default function Player({

@@ -26,7 +26,6 @@ export function resumeGame(saved: Record<string, number>) : GameState {
 
     return {
         ...state,
-        playing: true,
         players: state.players.map(p => ({
             ...p,
             chips: saved[p.id] ?? p.chips

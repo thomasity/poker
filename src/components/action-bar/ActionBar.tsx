@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import type { GameState, PlayerAction, Card as CardType } from "../../types";
+import type { GameState, Card as CardType } from "../../types";
 import styles from "./ActionBar.module.css";
 import Card from "../cards/Card";
 

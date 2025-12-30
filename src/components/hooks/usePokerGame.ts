@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { GameState, PlayerAction, GameEffect, GameEvent, PregameConfig } from '../../types';
 import * as engine from '../../poker';
 import * as bots from '../../poker/bots';
@@ -11,7 +11,7 @@ export function usePokerGame() {
         // return saved ? engine.resumeGame(saved) : engine.initGame();
         return engine.initGame();
     });
-    
+
     const timersRef = useRef<Map<"bot" | "hand" | "street", number>>(new Map());
 
     const clearTimer = useCallback((key: "bot" | "hand" | "street") => {

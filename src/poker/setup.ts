@@ -42,7 +42,7 @@ export function initGame() : GameState {
  * @returns The gamestate, ready to begin first hand.
  */
 export function startGame(state: GameState, config: PregameConfig) : GameState {
-    let players = state.players.map(p => ({ ...p })) as Player[];
+    const players = state.players.map(p => ({ ...p })) as Player[];
     config.players.forEach(p => players.push(p));
     players.forEach((p, i) => {
         p.chips = config.buyIn

@@ -1,7 +1,6 @@
 import type { GameState } from '../types';
 
-export default function ClickAnywhere({ state, onClick } : { state: GameState, onClick: () => void; }) {
-    const HandOutcome = ({ className } : { className: string}) => {
+function HandOutcome({ state, className } : { state: GameState, className: string}) {
         if (state.winnerInfo !== undefined) {
             if (state.players[state.winnerInfo.winnerIndex].handValue !== undefined) {
                 return (
@@ -22,11 +21,12 @@ export default function ClickAnywhere({ state, onClick } : { state: GameState, o
             }
         }
         return null;
-    }
+    };
 
+export default function ClickAnywhere({ state, onClick } : { state: GameState, onClick: () => void; }) {
     return (
         <div className="click-anywhere" onClick={onClick}>
-            <HandOutcome className="hand-outcome" />
+            <HandOutcome state={state}className="hand-outcome" />
         </div>
     )
 }
