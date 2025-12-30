@@ -1,16 +1,13 @@
 .add-bot-button {
-  /* size */
   width: clamp(72px, 8vw, 96px);
   height: clamp(72px, 8vw, 96px);
 
-  /* layout */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
 
-  /* look */
   border-radius: 9999px;
   border: 2px dashed rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.06);
@@ -21,6 +18,7 @@
 
   transition: transform 120ms ease, border-color 120ms ease,
     background-color 120ms ease;
+  z-index: 100;
 }
 
 .add-bot-button:hover {
@@ -41,12 +39,12 @@
 .plus {
   font-size: clamp(28px, 3.2vw, 40px);
   font-weight: 800;
-  line-height: 1; /* prevents vertical drift */
+  line-height: 1;
 }
 
 .add-bot {
   font-size: clamp(11px, 1.2vw, 13px);
-  font-weight: 500; /* 100 is too thin for UI */
+  font-weight: 500;
   opacity: 0.85;
   line-height: 1.1;
 }

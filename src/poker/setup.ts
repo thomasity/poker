@@ -19,7 +19,6 @@ export function initGame() : GameState {
     const dealerButton = -1;
 
     return {
-        playing: false,
         deck: [],
         community: [],
         players,
@@ -30,7 +29,7 @@ export function initGame() : GameState {
         dealerButton,
         currentBet: 0,
         currentPlayer: (dealerButton + 1) % players.length,
-        phase: 'handOver',
+        phase: 'setup',
         isGameOver: false
     }
 }
@@ -51,7 +50,6 @@ export function startGame(state: GameState, config: PregameConfig) : GameState {
     });
     return {
         ...state,
-        playing: true,
         players: players,
         phase: 'dealing',
     }

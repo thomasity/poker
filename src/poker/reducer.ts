@@ -44,7 +44,9 @@ import { initGame, startGame } from './setup';
 export function reduceGame(state: GameState, event: GameEvent) : { state: GameState; effects: GameEffect[] } {
     switch(event.type) {
         case "INITIATE_GAME": {
+            if (state.phase !== "setup") return { state, effects: [] };
             const next = startGame(state, event.config);
+            console.log(next);
             return {
                 state: next,
                 effects: [{ type: "AFTER", ms: 0, event: { type: "START_NEXT_HAND" }, key: "hand" } ]

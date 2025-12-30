@@ -56,7 +56,7 @@ export type Player = HumanPlayer | BotPlayer;
 
 export type Street = 'preflop' | 'flop' | 'turn' | 'river';
 
-export type Phase = 'inHand' | 'handOver' | 'showdown' | 'dealing' | 'ending';
+export type Phase = 'setup' |'inHand' | 'handOver' | 'showdown' | 'dealing' | 'ending';
 
 export type PregameConfig = {
     players: Player[],
@@ -81,7 +81,6 @@ export type GameEffect =
     | { type: "BOT_TURN_AFTER"; ms: number, key: "bot" };
 
 export interface GameState {
-    playing: boolean;
     deck: Card[];
     community: Card[];
     players: Player[];

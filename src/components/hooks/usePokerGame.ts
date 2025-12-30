@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import type { GameState, PlayerAction, GameEffect, GameEvent, PregameConfig } from '../types';
-import * as engine from '../poker';
-import * as bots from '../poker/bots';
+import type { GameState, PlayerAction, GameEffect, GameEvent, PregameConfig } from '../../types';
+import * as engine from '../../poker';
+import * as bots from '../../poker/bots';
+
+const TIMER_SENSITIVE = new Set(["INITIATE_GAME", "END_GAME", "START_NEXT_HAND"]);
 
 export function usePokerGame() {
     const [state, setState] = useState<GameState>(() => {
@@ -65,24 +67,26 @@ export function usePokerGame() {
         })
     }, [runEffects]);
 
-    const dispatch = useCallback((action: PlayerAction) => {
-        dispatchEvent({ type: "PLAYER_ACTION", action});
-    }, [dispatchEvent]);
+    const dispatchGame = useCallback((event: GameEvent) => {
+        if (TIMER_SENSITIVE.has(event.type)) clearAllTimers();
+        dispatchEvent(event);
+    }, [clearAllTimers, dispatchEvent]);
+
+    const dispatchPlayerAction = useCallback((action: PlayerAction) => {
+        dispatchGame({ type: "PLAYER_ACTION", action});
+    }, [dispatchGame]);
 
     const startGame = useCallback((config: PregameConfig) => {
-        clearAllTimers();
-        dispatchEvent({ type: "INITIATE_GAME", config });
-    }, [clearAllTimers, dispatchEvent]);
+        dispatchGame({ type: "INITIATE_GAME", config });
+    }, [dispatchGame]);
 
     const endGame = useCallback(() => {
-        clearAllTimers();
-        dispatchEvent({ type: "END_GAME" });
-    }, [clearAllTimers, dispatchEvent])
+        dispatchGame({ type: "END_GAME" });
+    }, [dispatchGame]);
 
     const startHand = useCallback(() => {
-        clearAllTimers();
-        dispatchEvent({ type: "START_NEXT_HAND" });
-    }, [clearAllTimers, dispatchEvent]);
+        dispatchGame({ type: "START_NEXT_HAND" });
+    }, [dispatchGame]);
 
     useEffect(() => {
         if (state.phase === "handOver") {
@@ -92,8 +96,5 @@ export function usePokerGame() {
 
     useEffect(() => clearAllTimers, [clearAllTimers]);
 
-    const canAct = useMemo(() => state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "human", [state]);
-    const isBotTurn = useMemo(() => state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "bot", [state]);
-    
-    return { state, dispatch, dispatchEvent, startGame, endGame, startHand, canAct, isBotTurn }
+    return { state, dispatchPlayerAction, startGame, endGame, startHand }
 }

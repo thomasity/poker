@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import type { GameState, PlayerAction, Card as CardType } from "../../types";
-import styles from "./UserControls.module.css";
+import styles from "./ActionBar.module.css";
 import Card from "../cards/Card";
 
 type BettingControlsProps = {
     state: GameState;
-    dispatch: (action: PlayerAction) => void;
+    dispatch: (amount: number) => void;
     setIsBetting: (betting: boolean) => void;
 };
 
@@ -65,7 +65,7 @@ function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProp
         type="button"
         disabled={!canSubmit}
         onClick={() => {
-          dispatch({ type: "bet", amount });
+          dispatch(amount);
           setIsBetting(false);
         }}
       >
@@ -75,37 +75,40 @@ function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProp
   );
 }
 
-function ActionControls({ state, dispatch, setIsBetting } : { state: GameState, dispatch: (action: PlayerAction) => void, setIsBetting: (betting: boolean) => void }) {
+function ActionControls({ state, onCall, onFold, setIsBetting } : { state: GameState, onCall: () => void, onFold: () => void, setIsBetting: (betting: boolean) => void }) {
     if (state.players.every(player => player.action === undefined)) {
         return (
             <div>
-                <button onClick={() => dispatch({ type: "call" })}>Check</button>
+                <button onClick={onCall}>Check</button>
                 <button onClick={() => setIsBetting(true)}>Bet</button>
-                <button onClick={() => dispatch({ type: "fold" })}>Fold</button>
+                <button onClick={onFold}>Fold</button>
             </div>
         )
     }
     else {
         return (
           <div>
-              <button onClick={() => dispatch({ type: "fold" })}>Fold</button>
-              <button onClick={() => dispatch({ type: "call" })}>Call</button>
+              <button onClick={onFold}>Fold</button>
+              <button onClick={onCall}>Call</button>
               <button onClick={() => setIsBetting(true)}>Raise</button>
           </div>
         )
     }
 }
 
-export default function UserControls({
+export function ActionBar({
   state,
-  canAct,
-  dispatch
+  onFold,
+  onCall,
+  onBet
 }: {
   state: GameState;
-  canAct: boolean;
-  dispatch: (action: PlayerAction) => void;
+  onFold: () => void;
+  onCall: () => void;
+  onBet: (amount: number) => void;
 }) {
   const [isBetting, setIsBetting] = useState(false);
+  const canAct = state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "human";
   const player = state.players.find(p => p.kind === "human")!;
   const actionStyle = player.displayedAction ? player.displayedAction[0] === "B" || player.displayedAction[0] === "R" ? "bet" :
                       player.displayedAction[0] === "F" ? "fold" :
@@ -123,16 +126,25 @@ export default function UserControls({
         </div>
       <div className={`${styles.controls} ${canAct ? styles.active : "" }`}>
         <div className={styles.userInfo}>
-          <h2>Pot: <span style={{ fontSize: "3rem"}}>${player.chips}</span></h2>
+          <h2>Chips: ${player.chips}</h2>
           {isDealer && <div>Dealer</div>}
         </div>
 
         <div className={styles.actions}>
           {canAct ? (
             isBetting ? (
-              <BettingControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
+              <BettingControls 
+                state={state} 
+                dispatch={onBet} 
+                setIsBetting={setIsBetting} 
+              />
             ) : (
-              <ActionControls state={state} dispatch={dispatch} setIsBetting={setIsBetting} />
+              <ActionControls 
+                state={state} 
+                onCall={onCall} 
+                onFold={onFold}
+                setIsBetting={setIsBetting} 
+              />
             )
           ) : (
             <div />

@@ -1,9 +1,15 @@
 
-.bot1 { left: 5%; top: 50%; }
-.bot2 { left: 25%; top: 15%; }
-.bot3 { left: 50%; top: 15%; }
-.bot4 { left: 75%; top: 15%; }
-.bot5 { left: 95%; top: 50%; }  
+.bot1 { left: 10%; top: 50%; }
+.bot2 { left: 25%; top: 15%; } 
+.bot3 { left: 75%; top: 15%; }
+.bot4 { left: 90%; top: 50%; } 
+
+@media (max-width: 640px) {
+  .bot1 { left: 15%; top: 60%; }
+  .bot2 { left: 15%; top: 20%; }
+  .bot3 { left: 85%; top: 20%; }
+  .bot4 { left: 85%; top: 60%;}
+}
 
 
 .player {
@@ -208,6 +214,13 @@
     left: 25%;
     top: -100%;
     pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .hand {
+    left: 35%;
+    top: -85%;
+  }
 }
 
 .cardWrapper {

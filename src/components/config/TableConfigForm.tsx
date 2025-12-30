@@ -1,22 +1,36 @@
 import React, { useMemo, useState } from "react";
 import styles from "./TableConfigForm.module.css";
-import type { PregameConfig } from "../../types";
+import useIsMobile from "../hooks/useIsMobile";
+import type { PregameConfig, Player } from "../../types";
 
-type Props = {
+interface Props {
   initial?: PregameConfig;
   startGame: (config: PregameConfig) => void;
   isStarting?: boolean;
-};
+}
 
 export function TableConfigForm({ initial, startGame, isStarting }: Props) {
   const [buyIn, setBuyIn] = useState(String(initial?.buyIn ?? 1000));
   const [smallBlind, setSmallBlind] = useState(String(initial?.smallBlind ?? 5));
   const [bigBlind, setBigBlind] = useState(String(initial?.bigBlind ?? 10));
+  const [players, setPlayers] = useState<Player[]>(initial?.players ?? []);
+
+  const isMobile = useIsMobile();
+
+  const toInt = (s: string) => Number.parseInt(s, 10);
+
+  const buyInNum = useMemo(() => toInt(buyIn), [buyIn]);
+  const smallBlindNum = useMemo(() => toInt(smallBlind), [smallBlind]);
+  const bigBlindNum = useMemo(() => toInt(bigBlind), [bigBlind]);
 
   const config = useMemo(() => {
-    const toInt = (s: string) => Number.parseInt(s, 10);
-    return { buyIn: toInt(buyIn), smallBlind: toInt(smallBlind), bigBlind: toInt(bigBlind), players: []};
-  }, [buyIn, smallBlind, bigBlind]);
+    return {
+      buyIn: buyInNum,
+      smallBlind: smallBlindNum,
+      bigBlind: bigBlindNum,
+      players: [...players],
+    };
+  }, [buyInNum, smallBlindNum, bigBlindNum, players]);
 
   const error = useMemo(() => {
     const { buyIn, smallBlind, bigBlind } = config;
@@ -29,6 +43,39 @@ export function TableConfigForm({ initial, startGame, isStarting }: Props) {
 
     return null;
   }, [config]);
+
+  const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+  const handleSetPlayers = (numOpponents: number) => {
+    const num = clamp(numOpponents, 0, 5);
+
+    setPlayers(prev => {
+      const next = [...prev];
+
+      while (next.length < num) {
+        const index = next.length + 1;
+        next.push({
+          id: `bot-${index}`,
+          name: `Bot ${index + 1}`,
+          index: index + 1,
+          chips: Number.isFinite(buyInNum) && buyInNum > 0 ? buyInNum : 1000,
+          hand: [],
+          folded: false,
+          currentBet: 0,
+          totalBet: 0,
+          kind: "bot",
+          botProfile: "basic",
+          tableIndex: index,
+        });
+      }
+
+      while (next.length > num) next.pop();
+
+      console.log(next);
+
+      return next;
+    });
+  };
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,7 +104,7 @@ export function TableConfigForm({ initial, startGame, isStarting }: Props) {
           <div className={styles.label}>Small blind</div>
           <input
             className={styles.input}
-            inputMode="decimal"
+            inputMode="numeric"
             pattern="[0-9]*"
             value={smallBlind}
             onChange={(e) => setSmallBlind(e.target.value)}
@@ -76,6 +123,23 @@ export function TableConfigForm({ initial, startGame, isStarting }: Props) {
             disabled={isStarting}
           />
         </div>
+
+        {isMobile && (
+          <div className={styles.field}>
+            <div className={styles.label}>Number of Opponents</div>
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              pattern="[0-4]*"
+              value={String(players.length)}
+              onChange={(e) => {
+                const v = Number.parseInt(e.target.value, 10);
+                handleSetPlayers(Number.isFinite(v) ? v : 0);
+              }}
+              disabled={isStarting}
+            />
+          </div>
+        )}
       </div>
 
       <div className={styles.errorSlot}>

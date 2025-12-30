@@ -1,4 +1,5 @@
 import type { Card as CardType } from '../../types';
+import styles from './Card.module.css';
 
 function cardUrl(card: CardType) {
     return `/cards/${card.suit}${card.rank}.svg`
@@ -13,7 +14,7 @@ export default function Card({ card, back } : { card: CardType, back?: boolean }
             <img 
                 src="/cards/redBack.svg" 
                 alt="blue card back" 
-                style={{ width: 80, height: "auto" }}
+                className={styles.card}
                 draggable={false}  
             />
         )
@@ -22,7 +23,7 @@ export default function Card({ card, back } : { card: CardType, back?: boolean }
         <img 
             src={url} 
             alt={`${card.rank} of ${card.suit}`} 
-            style={{ width: 80, height: "auto" }}
+            className={styles.card}
             draggable={false}
         />
     )

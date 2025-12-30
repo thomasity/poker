@@ -5,7 +5,7 @@ import Player from '../player/Player';
 import styles from './PokerTable.module.css';
 
 
-export default function PokerTable({ state } : { state: GameState; }) {
+export function PokerTableDefault({ state } : { state: GameState; }) {
     const [show, setShow] = useState<boolean>(false);
 
     useEffect(() => {

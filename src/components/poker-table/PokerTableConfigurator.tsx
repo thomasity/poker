@@ -6,7 +6,7 @@ import { TableConfigForm } from '../config/TableConfigForm';
 import styles from './PokerTable.module.css';
 
 
-export default function PokerTable({ state, startGame } : { state: GameState; startGame: (config: PregameConfig) => void; }) {
+export function PokerTableConfigurator({ state, startGame } : { state: GameState; startGame: (config: PregameConfig) => void; }) {
     const [opponents, setOpponents] = useState<(BotPlayer | null)[]>(new Array(5).fill(null));
     const [error, setError] = useState<string>("");
 
@@ -56,7 +56,7 @@ export default function PokerTable({ state, startGame } : { state: GameState; st
     }
     return (
         <div id={styles.table}>
-            {Array.from({ length: 5 }).map((_, index) => {
+            {Array.from({ length: 4 }).map((_, index) => {
                 const bot = opponents[index];
 
                 return (bot !== null) ? (
@@ -79,7 +79,6 @@ export default function PokerTable({ state, startGame } : { state: GameState; st
                     startGame={(config: PregameConfig) => {
                         handleStartGame(config);
                     }}
-
                 />
                 <div style={{ gridRow: 3, lineHeight: 1.5 }}>{error}</div>
             </div>

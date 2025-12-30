@@ -30,6 +30,7 @@
     0 14px 36px rgba(0, 0, 0, 0.45);
 
   backdrop-filter: blur(8px);
+
 }
 
 /* glossy sweep */
@@ -79,7 +80,6 @@
   font-size: 12px;
   opacity: 0.9;
   color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
 }
 
 .input {

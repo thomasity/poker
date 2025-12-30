@@ -1,31 +1,42 @@
-import { usePokerGame } from './ui/usePokerGame';
-import PokerTable from './ui/table/PokerTable';
-import UserControls from './ui/controls/UserControls';
-import ConfigTable from './ui/table/PokerTable.config';
-import ClickAnywhere from './ui/ClickAnywhere';
+import { usePokerGame } from './components/hooks/usePokerGame';
+import { ActionBar } from './components/action-bar';
+import { PokerTableConfigurator, PokerTableConfiguratorMobile, PokerTableDefault, PokerTableMobile } from './components/poker-table';
+import ClickAnywhere from './components/ClickAnywhere';
+import useIsMobile from './components/hooks/useIsMobile';
 
 export default function App() {
-  const { state, dispatch, startGame, endGame, startHand, canAct } = usePokerGame();
+  const { state, dispatchPlayerAction, startGame, endGame, startHand } = usePokerGame();
+  const playing = state.phase !== 'setup' && !state.isGameOver;
+  const player = state.players.find(p => p.kind === 'human')!;
+  const isMobile = useIsMobile();
 
   return (
     <div className="page-wrapper">
-        { state.phase === 'handOver' && state.playing && <ClickAnywhere state={state} onClick={startHand} /> }
-        {/* <div id="debug" style={{ position: 'absolute', top: 0, left: 0, maxHeight: '50vh', overflowY: 'scroll', fontSize: '10px' }}>
-            <pre>{JSON.stringify(state, null, 2)}</pre>
-        </div> */}
+        { state.phase === 'handOver' && <ClickAnywhere state={state} onClick={startHand} /> }
         <header>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', justifyContent: 'center' }}>
+            <div className="logo-container">
               <a id="logo" href="https://tommycallen.com"><img src='/logo.png' alt='Logo' width={128} /></a>
-              <h1 id="title" style={{ lineHeight: '0.25'}}>Poker Game <span style={{ fontSize: '12px', lineHeight: '0' }}><br />*This game is nowhere close to being fully complete/functional at the moment. Plz do not go all-in, assume big/small blinds do anything, or try running this on mobile...</span></h1>
+              {/* <h1>Poker</h1> */}
             </div>
-            <div style={{ gridColumn: '3', justifySelf: 'center' }}>
-            {state.playing ? <button onClick={endGame}>New Game</button> : <div />}
+            <div className="new-game-button">
+            {playing? <button onClick={endGame}>New Game</button> : <div />}
             </div>
         </header>
         <main>
-            {state.playing ? <PokerTable state={state} /> : <ConfigTable state={state} startGame={startGame} />}
+            {state.phase === 'setup' ? 
+                ( isMobile ? <PokerTableConfiguratorMobile state={state} startGame={startGame} /> : <PokerTableConfigurator state={state} startGame={startGame} /> )
+                : ( isMobile ? <PokerTableMobile state={state} /> : <PokerTableDefault state={state} />)}
         </main>
-        <UserControls state={state} canAct={canAct} dispatch={dispatch} />
+        {playing && !player.folded ? 
+            <ActionBar 
+                state={state}
+                onFold={() => dispatchPlayerAction({ type: "fold" })}
+                onCall={() => dispatchPlayerAction({ type: "call" })}
+                onBet={(amount: number) => dispatchPlayerAction({ type: "bet", amount })}
+            />
+            :
+            null
+        }
     </div>
   );
 }

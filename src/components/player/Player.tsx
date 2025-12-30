@@ -1,5 +1,6 @@
 import type { Card as CardType, BotPlayer, GameState } from '../../types';
 import Card from '../cards/Card';
+import useIsMobile from '../hooks/useIsMobile';
 import styles from './Player.module.css';
 
 export default function Player({
@@ -14,7 +15,6 @@ export default function Player({
 
     const isActive = state.phase === "inHand" && player.index === state.currentPlayer;
     const isDealer = state.dealerButton === player.index;
-
     const position = `bot${player.tableIndex}`
 
     return (
