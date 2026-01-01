@@ -4,11 +4,18 @@
 .bot3 { left: 75%; top: 15%; }
 .bot4 { left: 90%; top: 50%; } 
 
+@media (max-width: 850px) {
+  .bot1 { left: 10%; top: 50%; }
+  .bot2 { left: 20%; top: 10%; } 
+  .bot3 { left: 80%; top: 10%; }
+  .bot4 { left: 90%; top: 50%; } 
+}
+
 @media (max-width: 640px) {
-  .bot1 { left: 15%; top: 60%; }
-  .bot2 { left: 15%; top: 20%; }
-  .bot3 { left: 85%; top: 20%; }
-  .bot4 { left: 85%; top: 60%;}
+  .bot1 { left: 15%; top: 40%; }
+  .bot2 { left: 15%; top: 10%; }
+  .bot3 { left: 85%; top: 10%; }
+  .bot4 { left: 85%; top: 40%;}
 }
 
 

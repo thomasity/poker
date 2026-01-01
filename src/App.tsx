@@ -13,15 +13,16 @@ export default function App() {
   return (
     <div className="page-wrapper">
         { state.phase === 'handOver' && <ClickAnywhere state={state} onClick={startHand} /> }
-        <header>
-            <div className="logo-container">
-              <a id="logo" href="https://tommycallen.com"><img src='/logo.png' alt='Logo' width={128} /></a>
-              {/* <h1>Poker</h1> */}
-            </div>
-            <div className="new-game-button">
-            {playing? <button onClick={endGame}>New Game</button> : <div />}
-            </div>
-        </header>
+        {!isMobile && (
+          <header>
+              <div className="logo-container">
+                <a id="logo" href="https://tommycallen.com"><img src='/logo.png' alt='Logo' width={128} /></a>
+              </div>
+              <div className="new-game-button">
+              {playing? <button onClick={endGame}>New Game</button> : <div />}
+              </div>
+          </header>
+        ) }
         <main>
             {state.phase === 'setup' ? 
                 ( isMobile ? <PokerTableConfiguratorMobile state={state} startGame={startGame} /> : <PokerTableConfigurator state={state} startGame={startGame} /> )

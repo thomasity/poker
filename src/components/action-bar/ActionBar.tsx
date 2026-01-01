@@ -4,65 +4,87 @@ import styles from "./ActionBar.module.css";
 import Card from "../cards/Card";
 
 type BettingControlsProps = {
-    state: GameState;
-    dispatch: (amount: number) => void;
-    setIsBetting: (betting: boolean) => void;
+  state: GameState;
+  dispatch: (amount: number) => void;
+  setIsBetting: (betting: boolean) => void;
 };
 
-function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProps) {
-    const player = state.players[0];
-    const maxChips = Math.max(0, player.chips);
-    const defaultBet = useMemo(() => {
-        if (maxChips <= 0) return 0;
-        const minLegal = Math.max(1, state.currentBet + 1);
-        return Math.min(Math.max(1, minLegal), maxChips);
-    }, [maxChips, state.currentBet]);
+function BettingControls({ state, dispatch, setIsBetting }: BettingControlsProps) {
+  const player = state.players[0];
+  const maxChips = Math.max(0, player.chips);
 
-    const [amount, setAmount] = useState<number>(defaultBet);
+  const defaultBet = useMemo(() => {
+    if (maxChips <= 0) return 0;
+    const minLegal = Math.max(1, state.currentBet + 1);
+    return Math.min(Math.max(1, minLegal), maxChips);
+  }, [maxChips, state.currentBet]);
 
-    useEffect(() => {
-        setAmount(defaultBet);
-    }, [defaultBet]);
+  const [amount, setAmount] = useState<number>(defaultBet);
 
-    const canSubmit = maxChips > 0 && amount >= 1 && amount <= maxChips;
+  useEffect(() => setAmount(defaultBet), [defaultBet]);
 
-    return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", padding: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem" }}>
-        <button type="button" onClick={() => setIsBetting(false)}>
+  const canSubmit = maxChips > 0 && amount >= 1 && amount <= maxChips;
+
+  const quick = [
+    Math.min(maxChips, Math.max(1, Math.floor(maxChips * 0.25))),
+    Math.min(maxChips, Math.max(1, Math.floor(maxChips * 0.5))),
+    Math.min(maxChips, Math.max(1, Math.floor(maxChips * 0.75))),
+    maxChips,
+  ].filter((v, i, arr) => v > 0 && arr.indexOf(v) === i);
+
+  return (
+    <div className={styles.betGrid}>
+      <div className={styles.betHeader}>
+        <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={() => setIsBetting(false)}>
           Back
         </button>
 
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontWeight: 600 }}>{player.name}</div>
-          <div style={{ opacity: 0.8 }}>Chips: {player.chips}</div>
+        <div className={styles.betPlayer}>
+          <div className={styles.betPlayerName}>{player.name}</div>
+          <div className={styles.betPlayerChips}>Chips: {player.chips}</div>
         </div>
       </div>
 
-      <div>
-        <label htmlFor="betSlider" style={{ display: "block", marginBottom: "0.25rem" }}>
-          Bet amount: <strong>{amount}</strong>
-        </label>
+      <div className={styles.betBody}>
+        <div className={styles.betLabelRow}>
+          <span className={styles.betLabel}>Bet</span>
+          <span className={styles.betAmount}>${amount}</span>
+        </div>
 
         <input
           id="betSlider"
+          className={styles.slider}
           type="range"
           min={maxChips > 0 ? 1 : 0}
           max={maxChips}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           disabled={maxChips <= 0}
-          style={{ width: "100%" }}
         />
 
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", opacity: 0.8 }}>
+        <div className={styles.sliderScale}>
           <span>1</span>
           <span>{maxChips}</span>
+        </div>
+
+        <div className={styles.quickRow}>
+          {quick.map((v) => (
+            <button
+              key={v}
+              type="button"
+              className={styles.pill}
+              onClick={() => setAmount(v)}
+              disabled={maxChips <= 0}
+            >
+              ${v}
+            </button>
+          ))}
         </div>
       </div>
 
       <button
         type="button"
+        className={`${styles.btn} ${styles.btnPrimary}`}
         disabled={!canSubmit}
         onClick={() => {
           dispatch(amount);
@@ -75,32 +97,41 @@ function BettingControls({ state, dispatch, setIsBetting } : BettingControlsProp
   );
 }
 
-function ActionControls({ state, onCall, onFold, setIsBetting } : { state: GameState, onCall: () => void, onFold: () => void, setIsBetting: (betting: boolean) => void }) {
-    if (state.players.every(player => player.action === undefined)) {
-        return (
-            <div>
-                <button onClick={onCall}>Check</button>
-                <button onClick={() => setIsBetting(true)}>Bet</button>
-                <button onClick={onFold}>Fold</button>
-            </div>
-        )
-    }
-    else {
-        return (
-          <div>
-              <button onClick={onFold}>Fold</button>
-              <button onClick={onCall}>Call</button>
-              <button onClick={() => setIsBetting(true)}>Raise</button>
-          </div>
-        )
-    }
+function ActionControls({
+  state,
+  onCall,
+  onFold,
+  setIsBetting,
+}: {
+  state: GameState;
+  onCall: () => void;
+  onFold: () => void;
+  setIsBetting: (betting: boolean) => void;
+}) {
+  const allCalledOrUnset = state.players.every(
+    (p) => p.action === undefined || p.action.type === "call"
+  );
+
+  return (
+    <div className={styles.actionRow}>
+      <button className={`${styles.btn} ${styles.btnDanger}`} onClick={onFold}>
+        Fold
+      </button>
+      <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={onCall}>
+        {allCalledOrUnset ? "Check" : "Call"}
+      </button>
+      <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setIsBetting(true)}>
+        {allCalledOrUnset ? "Bet" : "Raise"}
+      </button>
+    </div>
+  );
 }
 
 export function ActionBar({
   state,
   onFold,
   onCall,
-  onBet
+  onBet,
 }: {
   state: GameState;
   onFold: () => void;
@@ -109,58 +140,60 @@ export function ActionBar({
 }) {
   const [isBetting, setIsBetting] = useState(false);
   const canAct = state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "human";
-  const player = state.players.find(p => p.kind === "human")!;
-  const actionStyle = player.displayedAction ? player.displayedAction[0] === "B" || player.displayedAction[0] === "R" ? "bet" :
-                      player.displayedAction[0] === "F" ? "fold" :
-                      "call" : "";
+  const player = state.players.find((p) => p.kind === "human")!;
   const isDealer = state.dealerButton !== undefined ? state.dealerButton === player.index : false;
+
+  const actionStyle =
+    player.displayedAction
+      ? player.displayedAction[0] === "B" || player.displayedAction[0] === "R"
+        ? "bet"
+        : player.displayedAction[0] === "F"
+          ? "fold"
+          : "call"
+      : "";
 
   return (
     <div className={styles.controlsContainer}>
-        <div
-          className={`${styles.displayedAction} ${styles[actionStyle] ?? ""} ${
-            player.displayedAction ? styles.visible : ""
-          }`}
-        >
-          {player.displayedAction}
-        </div>
-      <div className={`${styles.controls} ${canAct ? styles.active : "" }`}>
+      <div
+        className={`${styles.displayedAction} ${styles[actionStyle] ?? ""} ${
+          player.displayedAction ? styles.visible : ""
+        }`}
+      >
+        {player.displayedAction}
+      </div>
+
+      <div className={`${styles.controls} ${canAct ? styles.active : ""}`}>
         <div className={styles.userInfo}>
-          <h2>Chips: ${player.chips}</h2>
-          {isDealer && <div>Dealer</div>}
+          <div className={styles.userTop}>
+            <div className={styles.userLabel}>Your Stack</div>
+            {isDealer && <div className={styles.dealerPill}>Dealer</div>}
+          </div>
+          <div className={styles.userValue}>${player.chips}</div>
         </div>
 
         <div className={styles.actions}>
           {canAct ? (
             isBetting ? (
-              <BettingControls 
-                state={state} 
-                dispatch={onBet} 
-                setIsBetting={setIsBetting} 
-              />
+              <BettingControls state={state} dispatch={onBet} setIsBetting={setIsBetting} />
             ) : (
-              <ActionControls 
-                state={state} 
-                onCall={onCall} 
-                onFold={onFold}
-                setIsBetting={setIsBetting} 
-              />
+              <ActionControls state={state} onCall={onCall} onFold={onFold} setIsBetting={setIsBetting} />
             )
           ) : (
-            <div />
+            <div className={styles.waiting}>Waiting…</div>
           )}
         </div>
 
         <div className={styles.hand}>
-          {!player.folded && player.hand.map((card: CardType, index: number) => (
-            <div
-              key={`user-card-${index}`}
-              className={styles.cardWrapper}
-              style={{ left: `${index * 30}px` }}
-            >
-              <Card card={card} />
-            </div>
-          ))}
+          {!player.folded &&
+            player.hand.map((card: CardType, index: number) => (
+              <div
+                key={`user-card-${index}`}
+                className={styles.cardWrapper}
+                style={{ left: `${index * 30}px` }}
+              >
+                <Card card={card} />
+              </div>
+            ))}
         </div>
       </div>
     </div>
