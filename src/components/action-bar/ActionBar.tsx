@@ -12,14 +12,17 @@ type BettingControlsProps = {
 function BettingControls({ state, dispatch, setIsBetting }: BettingControlsProps) {
   const player = state.players[0];
   const maxChips = Math.max(0, player.chips);
+  const minLegalBet = Math.max(1, state.currentBet + 1);
 
   const defaultBet = useMemo(() => {
     if (maxChips <= 0) return 0;
-    const minLegal = Math.max(1, state.currentBet + 1);
-    return Math.min(Math.max(1, minLegal), maxChips);
-  }, [maxChips, state.currentBet]);
+    return Math.min(Math.max(1, minLegalBet), maxChips);
+  }, [maxChips, state.currentBet, minLegalBet]);
 
   const [amount, setAmount] = useState<number>(defaultBet);
+  const allCalledOrUnset = state.players.every(
+    (p) => p.action === undefined || p.action.type === "call"
+  );
 
   useEffect(() => setAmount(defaultBet), [defaultBet]);
 
@@ -38,16 +41,11 @@ function BettingControls({ state, dispatch, setIsBetting }: BettingControlsProps
         <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={() => setIsBetting(false)}>
           Back
         </button>
-
-        <div className={styles.betPlayer}>
-          <div className={styles.betPlayerName}>{player.name}</div>
-          <div className={styles.betPlayerChips}>Chips: {player.chips}</div>
-        </div>
       </div>
 
       <div className={styles.betBody}>
         <div className={styles.betLabelRow}>
-          <span className={styles.betLabel}>Bet</span>
+          <span className={styles.betLabel}>{allCalledOrUnset ? "Bet" : "Raise to"}</span>
           <span className={styles.betAmount}>${amount}</span>
         </div>
 
@@ -55,7 +53,7 @@ function BettingControls({ state, dispatch, setIsBetting }: BettingControlsProps
           id="betSlider"
           className={styles.slider}
           type="range"
-          min={maxChips > 0 ? 1 : 0}
+          min={minLegalBet}
           max={maxChips}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
@@ -63,7 +61,7 @@ function BettingControls({ state, dispatch, setIsBetting }: BettingControlsProps
         />
 
         <div className={styles.sliderScale}>
-          <span>1</span>
+          <span>{minLegalBet}</span>
           <span>{maxChips}</span>
         </div>
 
@@ -162,38 +160,33 @@ export function ActionBar({
         {player.displayedAction}
       </div>
 
-      <div className={`${styles.controls} ${canAct ? styles.active : ""}`}>
+      <div className={`${styles.controls}`}>
         <div className={styles.userInfo}>
           <div className={styles.userTop}>
             <div className={styles.userLabel}>Your Stack</div>
-            {isDealer && <div className={styles.dealerPill}>Dealer</div>}
+            {isDealer && <div className={styles.dealerPill} />}
           </div>
           <div className={styles.userValue}>${player.chips}</div>
+          <div className={styles.hand}>
+            {!player.folded &&
+              player.hand.map((card: CardType, index: number) => (
+                <div
+                  key={`user-card-${index}`}
+                  className={styles.cardWrapper}
+                  style={{ left: `${index * 30}px` }}
+                >
+                  <Card card={card} />
+                </div>
+              ))}
+          </div>
         </div>
 
-        <div className={styles.actions}>
-          {canAct ? (
-            isBetting ? (
+        <div className={`${styles.actions} ${canAct ? styles.active : ""}`}>
+            {isBetting ? (
               <BettingControls state={state} dispatch={onBet} setIsBetting={setIsBetting} />
             ) : (
               <ActionControls state={state} onCall={onCall} onFold={onFold} setIsBetting={setIsBetting} />
-            )
-          ) : (
-            <div className={styles.waiting}>Waiting…</div>
-          )}
-        </div>
-
-        <div className={styles.hand}>
-          {!player.folded &&
-            player.hand.map((card: CardType, index: number) => (
-              <div
-                key={`user-card-${index}`}
-                className={styles.cardWrapper}
-                style={{ left: `${index * 30}px` }}
-              >
-                <Card card={card} />
-              </div>
-            ))}
+            )}
         </div>
       </div>
     </div>

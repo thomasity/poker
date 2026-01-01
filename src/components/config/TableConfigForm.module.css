@@ -159,8 +159,12 @@
   cursor: not-allowed;
 }
 
-/* Responsive stacking */
 @media (max-width: 640px) {
+  .form {
+    position: fixed;
+    top: 20%;
+    
+  }
   .row {
     grid-template-columns: 1fr;
   }

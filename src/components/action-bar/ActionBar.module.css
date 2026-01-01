@@ -4,6 +4,7 @@
   right: 0;
   bottom: 0;
   z-index: 1000;
+  min-width: 0;
 
   display: flex;
   justify-content: center;
@@ -16,13 +17,23 @@
 .controls {
   pointer-events: auto;
 
-  width: min(1100px, 100%);
+  width: 100%;
+  min-width: 0;
   padding: 12px 14px;
 
   display: grid;
-  grid-template-columns: 220px 1fr 190px;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   gap: 14px;
+}
+
+/* Left info */
+.userInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  padding: 1rem;
+  width: fit-content;
 
   border-radius: 20px;
 
@@ -34,29 +45,6 @@
   box-shadow:
     0 12px 34px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-
-  transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    transform 220ms ease,
-    background-color 220ms ease;
-}
-
-.active {
-  border-color: rgba(74, 222, 128, 0.55);
-  box-shadow:
-    0 0 0 2px rgba(74, 222, 128, 0.18),
-    0 18px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
-}
-
-/* Left info */
-.userInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-left: 4px;
 }
 
 .userTop {
@@ -72,7 +60,7 @@
 }
 
 .userValue {
-  font-size: 1.3rem;
+  font-size: 3rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: #f9fafb;
@@ -80,20 +68,82 @@
 }
 
 .dealerPill {
-  font-size: 0.75rem;
-  padding: 4px 10px;
+
+  display: grid;
+  place-items: center;
+
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ffffff,
+    #f1f1f1 55%,
+    #d9d9d9 100%
+  );
+
   border-radius: 9999px;
-  background: rgba(245, 158, 11, 0.18);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fde68a;
+  padding: 4px 6px;
+  border: 2px solid #1f2937;
+
+  color: #1f2937;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 800;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+  
+}
+
+.dealerPill::before {
+  content: "Dealer";
+  padding: 2px 6px;
+
+  border-radius: 9999px;
+  border: 1.5px solid #111827;
 }
 
 /* Center actions */
 .actions {
+  justify-self: center;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 56px;
+  width: fit-content;
+  padding: 1rem 1.5rem;
+
+  border-radius: 20px;
+
+  background: rgba(12, 16, 28, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transform: translateY(calc(100% + 18px));
+  opacity: 0;
+
+  transition:
+    border-color 500ms ease,
+    box-shadow 500ms ease,
+    transform 320ms ease,
+    opacity 240ms ease,
+    background-color 500ms ease;
+}
+
+.active {
+  border-color: #4ade80;
+  box-shadow:
+    0 0 0 2px rgba(74, 222, 128, 0.35),
+    0 0 24px rgba(74, 222, 128, 0.35);
+
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .waiting {
@@ -122,17 +172,14 @@
   z-index: 10;
 }
 
-/* Action row buttons */
 .actionRow {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-/* Base button matches displayedAction pill vibe */
 .btn {
+  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 9999px;
 
@@ -173,7 +220,6 @@
   filter: none;
 }
 
-/* Variants echo displayedAction gradients */
 .btnPrimary {
   background: linear-gradient(
     135deg,
@@ -213,7 +259,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
-/* Ghost/back matches the neutral displayedAction base pill */
 .btnGhost {
   background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(10px);
@@ -226,7 +271,7 @@
 .betGrid {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr minmax(260px, 1.4fr) auto;
+  grid-template-columns: 1fr auto 1fr;
   gap: 12px;
   align-items: center;
 }
@@ -328,14 +373,11 @@
 /* Displayed action pill above bar (kept from your style but harmonized) */
 .displayedAction {
   position: absolute;
-  bottom: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%) translateY(6px);
-
+  transform: translateY(100%);
   padding: 8px 16px;
   border-radius: 9999px;
 
-  font-size: 1.65rem;
+  font-size: 2rem;
   font-weight: 900;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -355,12 +397,12 @@
   white-space: nowrap;
 
   opacity: 0;
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity 200ms ease, transform 400ms ease;
 }
 
 .visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 .bet {
@@ -379,10 +421,10 @@
   opacity: 0.9;
 }
 
-/* Responsive: stack nicely on mobile */
 @media (max-width: 780px) {
   .controls {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column-reverse;
     gap: 10px;
     border-radius: 18px;
   }
@@ -394,6 +436,14 @@
   .actionRow {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .userInfo {
+    width: 100%;
   }
 
   .btnPrimary,
