@@ -24,7 +24,7 @@ export interface HandOutcome {
     winningHand: string;
 }
 
-export type PlayerAction = { type: 'call' } | { type: 'bet'; amount: number } | { type: 'fold' } | { type: 'all-in' };
+export type PlayerAction = { type: 'call'; amount?: number } | { type: 'bet'; amount: number } | { type: 'fold' } | { type: 'all-in' };
 
 export type BotProfile = "basic" | "random" | "tight" | "aggressive";
 
@@ -56,7 +56,7 @@ export type Player = HumanPlayer | BotPlayer;
 
 export type Street = 'preflop' | 'flop' | 'turn' | 'river';
 
-export type Phase = 'setup' |'inHand' | 'handOver' | 'showdown' | 'dealing' | 'ending';
+export type Phase = 'setup' | 'inHand' | 'handOver' | 'showdown' | 'dealing' | 'ending';
 
 export type PregameConfig = {
     players: Player[],
@@ -86,9 +86,11 @@ export interface GameState {
     players: Player[];
     street: Street;
     pot: number;
-    bigBlind: number;
-    smallBlind: number;
-    dealerButton: number;
+    bigBlind?: number;
+    bigBlindIndex?: number;
+    smallBlind?: number;
+    smallBlindIndex?: number;
+    dealerIndex: number;
     currentBet: number;
     currentPlayer: number;
     winnerInfo?: HandOutcome;

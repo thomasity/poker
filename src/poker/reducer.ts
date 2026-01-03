@@ -234,20 +234,6 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
 }
 
 /**
- * 
- * @param state - GameState prior to starting new round of bets.
- * @returns - Index of first player to act after dealer.
- */
-function findFirstPlayerAfterDealer(state: GameState) : number {
-    const dealer = state.dealerButton;
-    let nextPlayer = (dealer + 1) % state.players.length;
-    while(state.players[nextPlayer].folded) {
-        nextPlayer = (nextPlayer + 1) % state.players.length;
-    }
-    return nextPlayer;
-}
-
-/**
  * Cleans up the table at the end of a hand by:
  * - Removing players with zero chips
  * - Resetting bets and hands for remaining players
@@ -282,17 +268,24 @@ export function startHand(state: GameState) : GameState {
             }
         });
     }
-    const nextDealer = (state.dealerButton + 1) % players.length;
+    const nextDealer = (state.dealerIndex + 1) % players.length;
     const firstToPlay = (nextDealer + 1) % players.length;
+    const smallBlindIndex = players.length == 2 ? nextDealer : firstToPlay;
+    const bigBlindIndex = (smallBlindIndex + 1) % players.length;
+    players[bigBlindIndex].chips -= state.bigBlind!;
+    players[smallBlindIndex].chips -= state.smallBlind!;
+    const pot = state.bigBlind! + state.smallBlind!;
 
     return {
         ...state,
         deck,
         community: [],
-        pot: 0,
+        pot,
         currentBet: 0,
-        dealerButton: nextDealer,
-        currentPlayer: firstToPlay,
+        dealerIndex: nextDealer,
+        smallBlindIndex,
+        bigBlindIndex,
+        currentPlayer: (bigBlindIndex + 1) % players.length,
         players,
         street: 'preflop',
         phase: 'inHand',
@@ -361,7 +354,8 @@ export function advanceStreet(state : GameState) : GameState {
     const community = [...state.community];
     const deck = [...state.deck];
     let street = state.street;
-    const nextPlayer = findFirstPlayerAfterDealer(state);
+    let nextPlayer = (state.bigBlindIndex! + 1) % players.length;
+    while (players[nextPlayer].folded) nextPlayer = (nextPlayer + 1) % players.length;
 
     if (state.players.every(p => p.action === undefined )) {
         console.warn("Cannot advance street: no player has acted yet.");

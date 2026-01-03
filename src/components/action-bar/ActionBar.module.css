@@ -96,6 +96,53 @@
   
 }
 
+.sbMarker {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #fff7ed,
+    #f59e0b 55%,
+    #d97706 100%
+  );
+
+  border: 2px solid #92400e;
+  border-radius: 9999px;
+  color: #3b1f0b;
+}
+
+.sbMarker::before {
+  content: "SB";
+  padding: 2px 6px;
+
+  border-radius: 9999px;
+  border: 1.5px solid #92400e;
+}
+
+.bbMarker {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #eff6ff,
+    #3b82f6 55%,
+    #2563eb 100%
+  );
+  border-radius: 9999px;
+  border: 2px solid #1e3a8a;
+  color: #0b1f3b;
+}
+
+.bbMarker::before {
+  content: "BB";
+  padding: 2px 6px;
+
+  border-radius: 9999px;
+  border: 1.5px solid #1e3a8a;
+}
+
+.dealerAndBlind {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
 .dealerPill::before {
   content: "Dealer";
   padding: 2px 6px;
@@ -370,7 +417,6 @@
   filter: none;
 }
 
-/* Displayed action pill above bar (kept from your style but harmonized) */
 .displayedAction {
   position: absolute;
   transform: translateY(100%);

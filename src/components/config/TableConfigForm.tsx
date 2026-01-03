@@ -126,7 +126,7 @@ export function TableConfigForm({ initial, startGame, isStarting }: Props) {
 
         {isMobile && (
           <div className={styles.field}>
-            <div className={styles.label}>Number of Opponents</div>
+            <div className={styles.label}>Number of Opponents [1-4]</div>
             <input
               className={styles.input}
               inputMode="numeric"

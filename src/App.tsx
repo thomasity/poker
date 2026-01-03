@@ -7,6 +7,7 @@ import useIsMobile from './components/hooks/useIsMobile';
 export default function App() {
   const { state, dispatchPlayerAction, startGame, endGame, startHand } = usePokerGame();
   const playing = state.phase !== 'setup' && !state.isGameOver;
+  
   const isMobile = useIsMobile();
 
   return (

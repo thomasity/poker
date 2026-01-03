@@ -16,7 +16,7 @@ export function initGame() : GameState {
         }
     ]
 
-    const dealerButton = -1;
+    const dealerIndex = -1;
 
     return {
         deck: [],
@@ -26,9 +26,9 @@ export function initGame() : GameState {
         pot: 0,
         bigBlind: 10,
         smallBlind: 5,
-        dealerButton,
+        dealerIndex,
         currentBet: 0,
-        currentPlayer: (dealerButton + 1) % players.length,
+        currentPlayer: (dealerIndex + 1) % players.length,
         phase: 'setup',
         isGameOver: false
     }
@@ -52,5 +52,7 @@ export function startGame(state: GameState, config: PregameConfig) : GameState {
         ...state,
         players: players,
         phase: 'dealing',
+        smallBlind: config.smallBlind,
+        bigBlind: config.bigBlind
     }
 }

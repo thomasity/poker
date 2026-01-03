@@ -13,7 +13,9 @@ export default function Player({
 }) {
 
     const isActive = state.phase === "inHand" && player.index === state.currentPlayer;
-    const isDealer = state.dealerButton === player.index;
+    const isDealer = state.dealerIndex === player.index;
+    const isSmallBlind = state.smallBlindIndex !== undefined ? state.smallBlindIndex === player.index : false;
+    const isBigBlind = state.bigBlindIndex !== undefined ? state.bigBlindIndex === player.index : false;
     const position = `bot${player.tableIndex}`
 
     return (
@@ -40,11 +42,31 @@ export default function Player({
                 <p className={styles.bet}>
                     Total Bet: {player.totalBet}
                 </p>
+                {isSmallBlind && (
+                    <div className={`${styles.blindMarker} ${styles.sb} ${styles.blindMarkerVisible}`}>SB</div>
+                )}
+                {isBigBlind && (
+                    <div className={`${styles.blindMarker} ${styles.bb} ${styles.blindMarkerVisible}`}>BB</div>
+                )}
                 {isDealer && <div className={styles['dealer']} />}
             </div>
             {player.displayedAction && 
                 <div className={styles.actionPopup} role="status" aria-live="polite">
                     {player.displayedAction}
+                </div>
+            }
+            {isSmallBlind && state.street === "preflop" &&
+                <div
+                className={`${styles.chipDelta} ${styles.chipDeltaSB}`}
+                >
+                    -${state.smallBlind}
+                </div>
+            }
+            {isBigBlind && state.street === "preflop" &&
+                <div
+                className={`${styles.chipDelta} ${styles.chipDeltaBB}`}
+                >
+                    -${state.bigBlind}
                 </div>
             }
         </div>

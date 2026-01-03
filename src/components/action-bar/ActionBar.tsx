@@ -139,7 +139,9 @@ export function ActionBar({
   const [isBetting, setIsBetting] = useState(false);
   const canAct = state.phase === "inHand" && state.players[state.currentPlayer]?.kind === "human";
   const player = state.players.find((p) => p.kind === "human")!;
-  const isDealer = state.dealerButton !== undefined ? state.dealerButton === player.index : false;
+  const isDealer = state.dealerIndex !== undefined ? state.dealerIndex === player.index : false;
+  const isSmallBlind = state.smallBlindIndex !== undefined ? state.smallBlindIndex === player.index : false;
+  const isBigBlind = state.bigBlindIndex !== undefined ? state.bigBlindIndex === player.index : false;
 
   const actionStyle =
     player.displayedAction
@@ -164,7 +166,11 @@ export function ActionBar({
         <div className={styles.userInfo}>
           <div className={styles.userTop}>
             <div className={styles.userLabel}>Your Stack</div>
-            {isDealer && <div className={styles.dealerPill} />}
+            <div className={styles.dealerAndBlind}>
+              { isDealer && <div className={styles.dealerPill} /> }
+              { isSmallBlind && <div className={`${styles.actionMarker} ${styles.sbMarker} ${styles.visible}`} /> }
+              { isBigBlind && <div className={`${styles.actionMarker} ${styles.bbMarker} ${styles.visible}`} /> }
+            </div>
           </div>
           <div className={styles.userValue}>${player.chips}</div>
           <div className={styles.hand}>
