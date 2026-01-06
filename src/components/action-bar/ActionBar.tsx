@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import type { GameState, Card as CardType } from "../../types";
 import styles from "./ActionBar.module.css";
 import Card from "../cards/Card";
+import { isCheckOrBet } from "../../poker/lib/actions";
 
 type BettingControlsProps = {
   state: GameState;
@@ -106,9 +107,7 @@ function ActionControls({
   onFold: () => void;
   setIsBetting: (betting: boolean) => void;
 }) {
-  const allCalledOrUnset = state.players.every(
-    (p) => p.action === undefined || p.action.type === "call"
-  );
+  const allCalledOrUnset = isCheckOrBet(state, state.players.find(p => p.kind === "human")!)
 
   return (
     <div className={styles.actionRow}>
