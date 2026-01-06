@@ -1,7 +1,7 @@
-import type { GameState, PlayerAction } from "../../types";
+import type { GameState, PlayerAction, Player } from "../../types";
 
 
-export function actionToDisplay(state: GameState, action?: PlayerAction) : string {
+export function actionToDisplay(state: GameState, player: Player, action?: PlayerAction) : string {
     if (!action) return "";
 
     switch (action.type) {
@@ -11,12 +11,13 @@ export function actionToDisplay(state: GameState, action?: PlayerAction) : strin
         case "all-in":
             return "All In";
         
-        case "call":
-            return state.currentBet === 0 ? "Check" : "Call";
+        case "call": {
+            return (player.currentBet === state.currentBet) ? "Check" : "Call";
+        }
         
         case "bet":
             if (state.currentBet === 0) return `Bet $${action.amount}`;
-            return `Raise to $${action.amount}`;
+            return `Raise to $${player.currentBet + action.amount}`;
         
         default:
             return "";

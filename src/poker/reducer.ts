@@ -185,6 +185,7 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         player.action = { type: "fold" };
         player.currentBet = 0;
         player.totalBet = 0;
+        player.displayedAction = actionToDisplay(state, player, action);
         break;
     }
     case "call": {
@@ -197,6 +198,7 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         player.currentBet += paid;
         player.totalBet += paid;
         player.action = { type: "call" };
+        player.displayedAction = actionToDisplay(state, player, action);
         break;
     }
     case "bet": {
@@ -209,6 +211,7 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         const amt = Math.max(0, Math.min(player.chips, action.amount));
         player.chips -= amt;
         pot += amt;
+        player.displayedAction = actionToDisplay(state, player, action);
         player.currentBet += amt;
         player.totalBet += amt;
         currentBet = Math.max(currentBet, player.currentBet);
@@ -219,8 +222,6 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
         default:
             break;
     }
-        
-  player.displayedAction = actionToDisplay(state, action);
   let nextPlayer = (i + 1) % players.length;
   while (players[nextPlayer].folded) nextPlayer = (nextPlayer + 1) % players.length;
 
@@ -232,7 +233,7 @@ function applyAction(state: GameState, action: PlayerAction): GameState {
     currentPlayer: nextPlayer
   };
 }
-
+ 
 /**
  * Cleans up the table at the end of a hand by:
  * - Removing players with zero chips
@@ -273,7 +274,11 @@ export function startHand(state: GameState) : GameState {
     const smallBlindIndex = players.length == 2 ? nextDealer : firstToPlay;
     const bigBlindIndex = (smallBlindIndex + 1) % players.length;
     players[bigBlindIndex].chips -= state.bigBlind!;
+    players[bigBlindIndex].currentBet = state.bigBlind!;
+    players[bigBlindIndex].totalBet = state.bigBlind!;
     players[smallBlindIndex].chips -= state.smallBlind!;
+    players[smallBlindIndex].currentBet = state.smallBlind!;
+    players[smallBlindIndex].totalBet = state.smallBlind!;
     const pot = state.bigBlind! + state.smallBlind!;
 
     return {
@@ -281,7 +286,7 @@ export function startHand(state: GameState) : GameState {
         deck,
         community: [],
         pot,
-        currentBet: 0,
+        currentBet: state.bigBlind!,
         dealerIndex: nextDealer,
         smallBlindIndex,
         bigBlindIndex,
